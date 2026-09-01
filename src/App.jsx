@@ -354,6 +354,13 @@ async function verifyEditPin(candidate) {
   if (error) return false;
   return data === true;
 }
+/* School Notes has its own separate code (app_settings.notes_pin), distinct
+   from the general edit PIN, so only staff who know it can get in. */
+async function verifyNotesPin(candidate) {
+  const { data, error } = await supabase.rpc("verify_notes_pin", { candidate });
+  if (error) return false;
+  return data === true;
+}
 async function loadSchoolNotes(pin) {
   const { data, error } = await supabase.rpc("get_school_notes", { candidate: pin });
   if (error) return null;
@@ -2142,12 +2149,20 @@ function ContactsView() {
 }
 
 /* ---------------------------------------------------------------------- */
-/*  SCHOOL NOTES, staff-only. Content is never fetched without a verified  */
-/*  PIN, see EditGate and get_school_notes/set_school_notes in Supabase.   */
+/*  SCHOOL NOTES, staff-only, gated by its OWN separate code (distinct      */
+/*  from the general edit PIN). Content is never fetched without a         */
+/*  verified code, see get_school_notes/set_school_notes/verify_notes_pin  */
+/*  in Supabase.                                                            */
 /* ---------------------------------------------------------------------- */
-function NotesView({ pin }) {
+function NotesView() {
+  const [pin, setPin] = useState(() => {
+    try { return sessionStorage.getItem("emic-notes-pin"); } catch { return null; }
+  });
   const [notes, setNotes] = useState("");
   const [loaded, setLoaded] = useState(false);
+  const [value, setValue] = useState("");
+  const [err, setErr] = useState(false);
+  const [checking, setChecking] = useState(false);
 
   useEffect(() => {
     if (!pin) {
@@ -2158,18 +2173,63 @@ function NotesView({ pin }) {
     (async () => {
       setLoaded(false);
       const saved = await loadSchoolNotes(pin);
-      if (typeof saved === "string") setNotes(saved);
+      if (saved === null) {
+        setPin(null);
+        try { sessionStorage.removeItem("emic-notes-pin"); } catch {}
+        return;
+      }
+      setNotes(saved);
       setLoaded(true);
     })();
   }, [pin]);
 
   if (!pin) {
+    const attempt = async () => {
+      setChecking(true);
+      const ok = await verifyNotesPin(value);
+      setChecking(false);
+      if (ok) {
+        setPin(value);
+        try { sessionStorage.setItem("emic-notes-pin", value); } catch {}
+        setValue("");
+        setErr(false);
+      } else {
+        setErr(true);
+      }
+    };
     return (
-      <div className="flex items-start gap-2 rounded-lg p-3" style={{ background: C.cardAlt, border: `1px solid ${C.line}` }}>
-        <Lock size={16} style={{ color: C.gold, flexShrink: 0, marginTop: 2 }} />
-        <p className="text-xs" style={{ color: C.sub, fontFamily: FONTS.body }}>
-          Staff only. Enter the edit code (top right) to view or change these notes.
-        </p>
+      <div className="rounded-lg p-4" style={{ background: C.cardAlt, border: `1px solid ${C.line}`, maxWidth: 360 }}>
+        <div className="flex items-start gap-2 mb-3">
+          <Lock size={16} style={{ color: C.gold, flexShrink: 0, marginTop: 2 }} />
+          <p className="text-xs" style={{ color: C.sub, fontFamily: FONTS.body }}>
+            Staff only. This section has its own separate code, not the general edit code.
+          </p>
+        </div>
+        <div className="flex gap-2">
+          <input
+            autoFocus
+            type="password"
+            value={value}
+            onChange={(e) => { setValue(e.target.value); setErr(false); }}
+            onKeyDown={(e) => { if (e.key === "Enter") attempt(); }}
+            placeholder="Notes code"
+            className="flex-1 rounded-md px-3 py-2 text-sm outline-none"
+            style={{ background: C.card, border: `1px solid ${err ? "#E74C3C" : C.line}`, color: C.ink, fontFamily: FONTS.body }}
+          />
+          <button
+            onClick={attempt}
+            disabled={checking}
+            className="px-4 py-2 rounded-md text-xs font-bold uppercase tracking-wide"
+            style={{ background: C.gold, color: "#141414", opacity: checking ? 0.6 : 1 }}
+          >
+            {checking ? "Checking…" : "Unlock"}
+          </button>
+        </div>
+        {err && (
+          <div className="text-xs mt-2" style={{ color: "#E74C3C", fontFamily: FONTS.body }}>
+            Incorrect code.
+          </div>
+        )}
       </div>
     );
   }
@@ -2179,7 +2239,7 @@ function NotesView({ pin }) {
       <div className="flex items-start gap-2 mb-4 rounded-lg p-3" style={{ background: C.cardAlt, border: `1px solid ${C.line}` }}>
         <Lock size={16} style={{ color: C.gold, flexShrink: 0, marginTop: 2 }} />
         <p className="text-xs" style={{ color: C.sub, fontFamily: FONTS.body }}>
-          Meant for Matt and team only. Only visible to whoever has entered the edit code.
+          Meant for Matt and team only. Only visible to whoever knows this section's code.
         </p>
       </div>
       {!loaded ? (
@@ -2324,7 +2384,7 @@ export default function EmicProductionDatabase() {
 
         {view === "schedule" && <ScheduleView productions={productions} />}
         {view === "contacts" && <ContactsView />}
-        {view === "notes" && <NotesView pin={unlockPin} />}
+        {view === "notes" && <NotesView />}
       </main>
 
       <footer className="text-center text-xs py-6" style={{ color: C.mute, fontFamily: FONTS.body }}>
