@@ -359,7 +359,7 @@ async function saveSchoolNotes(content) {
 }
 async function fetchEditPin() {
   const { data, error } = await supabase.from("app_settings").select("edit_pin").eq("id", 1).single();
-  console.log("[EMIC DEBUG] fetchEditPin", { data, error });
+  console.log("[EMIC DEBUG] fetchEditPin", JSON.stringify({ data, error: error ? { message: error.message, code: error.code, details: error.details, hint: error.hint } : null } ));
   if (error || !data) return null;
   return data.edit_pin;
 }
