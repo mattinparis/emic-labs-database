@@ -345,22 +345,24 @@ async function saveProductionSections(id, sections) {
     .eq("id", id);
   return !error;
 }
-async function loadSchoolNotes() {
-  const { data, error } = await supabase.from("school_notes").select("content").eq("id", 1).single();
-  if (error || !data) return null;
-  return data.content;
+/* School Notes and the PIN check go through Postgres functions (see the SQL
+   in the deployment handoff), not direct table reads. That way the real PIN
+   and the notes content never reach a browser that hasn't proven it knows
+   the code, unlike a client-side comparison against a fetched value. */
+async function verifyEditPin(candidate) {
+  const { data, error } = await supabase.rpc("verify_edit_pin", { candidate });
+  if (error) return false;
+  return data === true;
 }
-async function saveSchoolNotes(content) {
-  const { error } = await supabase
-    .from("school_notes")
-    .update({ content, updated_at: new Date().toISOString() })
-    .eq("id", 1);
-  return !error;
+async function loadSchoolNotes(pin) {
+  const { data, error } = await supabase.rpc("get_school_notes", { candidate: pin });
+  if (error) return null;
+  return data;
 }
-async function fetchEditPin() {
-  const { data, error } = await supabase.from("app_settings").select("edit_pin").eq("id", 1).single();
-  if (error || !data) return null;
-  return data.edit_pin;
+async function saveSchoolNotes(pin, content) {
+  const { data, error } = await supabase.rpc("set_school_notes", { candidate: pin, new_content: content });
+  if (error) return false;
+  return data === true;
 }
 
 /* ---------------------------------------------------------------------- */
@@ -431,6 +433,7 @@ function EditGate({ unlocked, onUnlock, onLock }) {
   const [open, setOpen] = useState(false);
   const [value, setValue] = useState("");
   const [err, setErr] = useState(false);
+  const [checking, setChecking] = useState(false);
 
   if (unlocked) {
     return (
@@ -444,8 +447,11 @@ function EditGate({ unlocked, onUnlock, onLock }) {
     );
   }
 
-  const attempt = () => {
-    if (onUnlock(value)) {
+  const attempt = async () => {
+    setChecking(true);
+    const ok = await onUnlock(value);
+    setChecking(false);
+    if (ok) {
       setOpen(false);
       setValue("");
       setErr(false);
@@ -485,10 +491,11 @@ function EditGate({ unlocked, onUnlock, onLock }) {
           )}
           <button
             onClick={attempt}
+            disabled={checking}
             className="w-full px-3 py-1.5 rounded-md text-xs font-bold uppercase tracking-wide"
-            style={{ background: C.gold, color: "#141414" }}
+            style={{ background: C.gold, color: "#141414", opacity: checking ? 0.6 : 1 }}
           >
-            Unlock
+            {checking ? "Checking…" : "Unlock"}
           </button>
         </div>
       )}
@@ -2135,39 +2142,55 @@ function ContactsView() {
 }
 
 /* ---------------------------------------------------------------------- */
-/*  SCHOOL NOTES, shared. Gated behind the edit PIN, see EditGate.         */
+/*  SCHOOL NOTES, staff-only. Content is never fetched without a verified  */
+/*  PIN, see EditGate and get_school_notes/set_school_notes in Supabase.   */
 /* ---------------------------------------------------------------------- */
-function NotesView({ readOnly }) {
+function NotesView({ pin }) {
   const [notes, setNotes] = useState("");
   const [loaded, setLoaded] = useState(false);
 
   useEffect(() => {
+    if (!pin) {
+      setNotes("");
+      setLoaded(false);
+      return;
+    }
     (async () => {
-      const saved = await loadSchoolNotes();
-      if (saved && typeof saved === "string") setNotes(saved);
+      setLoaded(false);
+      const saved = await loadSchoolNotes(pin);
+      if (typeof saved === "string") setNotes(saved);
       setLoaded(true);
     })();
-  }, []);
+  }, [pin]);
+
+  if (!pin) {
+    return (
+      <div className="flex items-start gap-2 rounded-lg p-3" style={{ background: C.cardAlt, border: `1px solid ${C.line}` }}>
+        <Lock size={16} style={{ color: C.gold, flexShrink: 0, marginTop: 2 }} />
+        <p className="text-xs" style={{ color: C.sub, fontFamily: FONTS.body }}>
+          Staff only. Enter the edit code (top right) to view or change these notes.
+        </p>
+      </div>
+    );
+  }
 
   return (
     <div>
       <div className="flex items-start gap-2 mb-4 rounded-lg p-3" style={{ background: C.cardAlt, border: `1px solid ${C.line}` }}>
         <Lock size={16} style={{ color: C.gold, flexShrink: 0, marginTop: 2 }} />
         <p className="text-xs" style={{ color: C.sub, fontFamily: FONTS.body }}>
-          Meant for Matt and team only. Anyone with the link can view this tab; enter the edit code to change it.
+          Meant for Matt and team only. Only visible to whoever has entered the edit code.
         </p>
       </div>
       {!loaded ? (
         <div className="text-sm" style={{ color: C.mute }}>Loading.</div>
-      ) : readOnly ? (
-        <StaticSection value={notes} emptyText="No notes yet." />
       ) : (
         <EditableSection
           value={notes}
           placeholder="Internal notes: group concerns, budget flags, jury scheduling, anything not meant for students."
           onSave={async (v) => {
             setNotes(v);
-            await saveSchoolNotes(v);
+            await saveSchoolNotes(pin, v);
           }}
         />
       )}
@@ -2187,10 +2210,10 @@ export default function EmicProductionDatabase() {
   const [openExampleId, setOpenExampleId] = useState(null);
   const [search, setSearch] = useState("");
   const [loaded, setLoaded] = useState(false);
-  const [editPin, setEditPin] = useState(null);
-  const [unlocked, setUnlocked] = useState(() => {
-    try { return sessionStorage.getItem("emic-unlocked") === "1"; } catch { return false; }
+  const [unlockPin, setUnlockPin] = useState(() => {
+    try { return sessionStorage.getItem("emic-unlock-pin"); } catch { return null; }
   });
+  const unlocked = unlockPin != null;
 
   useEffect(() => {
     (async () => {
@@ -2203,22 +2226,19 @@ export default function EmicProductionDatabase() {
       setProductions(merged);
       setLoaded(true);
     })();
-    (async () => {
-      setEditPin(await fetchEditPin());
-    })();
   }, []);
 
-  const handleUnlock = (value) => {
-    if (editPin != null && value === editPin) {
-      setUnlocked(true);
-      try { sessionStorage.setItem("emic-unlocked", "1"); } catch {}
-      return true;
+  const handleUnlock = async (value) => {
+    const ok = await verifyEditPin(value);
+    if (ok) {
+      setUnlockPin(value);
+      try { sessionStorage.setItem("emic-unlock-pin", value); } catch {}
     }
-    return false;
+    return ok;
   };
   const handleLock = () => {
-    setUnlocked(false);
-    try { sessionStorage.removeItem("emic-unlocked"); } catch {}
+    setUnlockPin(null);
+    try { sessionStorage.removeItem("emic-unlock-pin"); } catch {}
   };
 
   const filtered = useMemo(() => {
@@ -2304,7 +2324,7 @@ export default function EmicProductionDatabase() {
 
         {view === "schedule" && <ScheduleView productions={productions} />}
         {view === "contacts" && <ContactsView />}
-        {view === "notes" && <NotesView readOnly={!unlocked} />}
+        {view === "notes" && <NotesView pin={unlockPin} />}
       </main>
 
       <footer className="text-center text-xs py-6" style={{ color: C.mute, fontFamily: FONTS.body }}>
