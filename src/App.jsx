@@ -404,6 +404,13 @@ function buildLocale(lang) {
   };
 }
 
+/* Live productions are numbered in theme order, Group 1 to 6. The worked
+   examples have their own ids, so they get no number. */
+function groupNumber(productionId) {
+  const i = THEMES.findIndex((th) => th.id === productionId);
+  return i === -1 ? null : i + 1;
+}
+
 function readSavedLang() {
   try {
     const saved = localStorage.getItem("emic-lang");
@@ -1742,7 +1749,7 @@ function PrintView({ production, theme, readOnly, onClose }) {
 
       <div style={{ maxWidth: 720, margin: "0 auto", padding: "40px 32px 80px", fontFamily: "Arial, Helvetica, sans-serif" }}>
         <div style={{ borderBottom: `3px solid ${theme.color}`, paddingBottom: 16, marginBottom: 24 }}>
-          <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: 2, textTransform: "uppercase", color: theme.color }}>{theme.name}</div>
+          <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: 2, textTransform: "uppercase", color: theme.color }}>{theme.name}{groupNumber(production.id) && ` · ${t.groupN(groupNumber(production.id))}`}</div>
           <div style={{ fontSize: 28, fontWeight: 800, color: "#111", marginTop: 4 }}>{title || t.untitled}</div>
           {tagline && <div style={{ fontSize: 14, color: "#555", marginTop: 2 }}>{tagline}</div>}
           <div style={{ fontSize: 10, color: "#999", marginTop: 10, letterSpacing: 0.5 }}>
@@ -1892,7 +1899,10 @@ function ProductionDetail({ production, readOnly, onUpdate, onClose }) {
         <div className="flex items-start justify-between p-6" style={{ borderBottom: `1px solid ${C.line}` }}>
           <div className="flex-1">
             <div>
-              <div className="text-xl font-bold uppercase tracking-widest" style={{ color: C.ink, fontFamily: FONTS.body }}>{theme.name}</div>
+              <div className="text-xl font-bold uppercase tracking-widest" style={{ color: C.ink, fontFamily: FONTS.body }}>
+                {theme.name}
+                {groupNumber(production.id) && <span style={{ color: theme.color }}> {t.groupN(groupNumber(production.id))}</span>}
+              </div>
               <p className="text-sm italic mt-1" style={{ color: C.sub, fontFamily: FONTS.body }}>{theme.prompt}</p>
             </div>
 
@@ -2030,7 +2040,9 @@ function ProductionCard({ production, onOpen }) {
       <FilmStripBar color={theme.color} height={10} orientation="vertical" />
       <div className="p-6 flex-1">
         <div className="flex items-start justify-between mb-1">
-          <div className="text-lg font-bold uppercase tracking-wide" style={{ color: C.ink, fontFamily: FONTS.body }}>{theme.name}</div>
+          <div className="text-lg font-bold uppercase tracking-wide" style={{ color: C.ink, fontFamily: FONTS.body }}>
+            {theme.name} <span style={{ color: theme.color }}>{t.groupN(groupNumber(production.id))}</span>
+          </div>
           <ChevronRight size={20} style={{ color: C.mute }} />
         </div>
         <p className="text-sm mb-4" style={{ color: C.sub, fontFamily: FONTS.body, fontStyle: "italic" }}>{theme.prompt}</p>
@@ -2188,7 +2200,10 @@ function ScheduleView({ productions }) {
             >
               <div className="col-span-2 flex items-center gap-2">
                 <span style={{ width: 8, height: 8, borderRadius: 999, background: theme.color, flexShrink: 0 }} />
-                <span style={{ color: C.ink, fontFamily: FONTS.body, fontWeight: 600 }}>{theme.name}</span>
+                <span style={{ color: C.ink, fontFamily: FONTS.body, fontWeight: 600 }}>
+                  {theme.name}
+                  <span className="block text-xs" style={{ color: C.mute, fontWeight: 500, whiteSpace: "nowrap" }}>{t.groupN(groupNumber(p.id))}</span>
+                </span>
               </div>
               <div className="col-span-3" style={{ color: p.sections.filmTitle ? C.ink : C.mute, fontFamily: FONTS.body }}>
                 {p.sections.filmTitle || t.noTitle}
@@ -2407,10 +2422,10 @@ export default function EmicProductionDatabase() {
     const q = search.toLowerCase();
     return productions.filter((p) => {
       const theme = locale.THEMES.find((th) => th.id === p.themeId);
-      const haystack = `${theme?.name || ""} ${p.sections.filmTitle || ""} ${p.sections.tagline || ""} ${p.sections.members || ""}`.toLowerCase();
+      const haystack = `${theme?.name || ""} ${t.groupN(groupNumber(p.id))} ${p.sections.filmTitle || ""} ${p.sections.tagline || ""} ${p.sections.members || ""}`.toLowerCase();
       return haystack.includes(q);
     });
-  }, [productions, search, locale]);
+  }, [productions, search, locale, t]);
 
   const openProd = productions.find((p) => p.id === openId);
   const openExample = locale.EXAMPLE_PRODUCTIONS.find((e) => e.id === openExampleId);
