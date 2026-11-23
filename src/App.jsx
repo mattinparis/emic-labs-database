@@ -2,7 +2,7 @@ import { useState, useEffect, useMemo, createContext, useContext } from "react";
 import {
   Search, LayoutGrid, Sparkles, Wallet, Calendar, Film, ClipboardList,
   MessageCircle, X, Check, Clock, ChevronRight, BookOpen, FolderOpen, Users,
-  Phone, Mail, ListChecks, StickyNote, Lock, Printer, Plus, Trash2, Package, ScrollText,
+  Phone, Mail, StickyNote, Lock, Printer, Plus, Trash2, Package, ScrollText,
 } from "lucide-react";
 import { LOGO_B64 } from "./logo.js";
 import { supabase } from "./supabaseClient.js";
@@ -78,16 +78,16 @@ const THEMES = [
 ];
 
 const STAGES = [
-  { id: "oct", label: "October", detail: "Kickoff, concept brief and groups & themes confirmed" },
-  { id: "nov", label: "November", detail: "R&D" },
-  { id: "dec", label: "December", detail: "R&D" },
-  { id: "jan", label: "January", detail: "Statement of intent" },
-  { id: "feb", label: "February", detail: "Pre-production and shoot prep" },
-  { id: "mar", label: "March", detail: "Shooting" },
-  { id: "apr", label: "April", detail: "Shooting + Post-production" },
-  { id: "may", label: "May", detail: "Post-production and rough cut screened" },
-  { id: "jun", label: "June", detail: "Final edit & mix" },
-  { id: "jul", label: "July", detail: "Final screening & jury" },
+  { id: "oct", label: "October", detail: "Intro & brief" },
+  { id: "nov", label: "November", detail: "Groups & themes · Workshop Q&A" },
+  { id: "dec", label: "December", detail: "R&D · Statement of intent, scouting, script" },
+  { id: "jan", label: "January", detail: "Pre-production · Pitch, location, budget" },
+  { id: "feb", label: "February", detail: "Pre-production · Pitch, location, budget, contracts, means" },
+  { id: "mar", label: "March", detail: "Shoot" },
+  { id: "apr", label: "April", detail: "Shoot / post-production" },
+  { id: "may", label: "May", detail: "1st screening · Internal rough cut viewing" },
+  { id: "jun", label: "June", detail: "Post-production · Final mix & exports, final jury screening" },
+  { id: "jul", label: "July", detail: "Debrief · Full class on the season" },
 ];
 
 const TABS = [
@@ -2171,61 +2171,6 @@ function BriefView({ onOpenExample }) {
 }
 
 /* ---------------------------------------------------------------------- */
-/*  SCHEDULE VIEW, one row per production so the whole cohort's progress   */
-/*  is visible at a glance.                                                 */
-/* ---------------------------------------------------------------------- */
-function ScheduleView({ productions }) {
-  const { t, THEMES, STAGES } = useI18n();
-  return (
-    <div>
-      <p className="text-sm mb-4" style={{ color: C.sub, fontFamily: FONTS.body }}>
-        {t.scheduleIntro}
-      </p>
-      <div className="rounded-xl overflow-hidden" style={{ border: `1px solid ${C.line}` }}>
-        <div className="grid grid-cols-12 px-4 py-3 text-xs font-bold uppercase tracking-wide" style={{ background: C.cardAlt, color: C.mute }}>
-          <div className="col-span-2">{t.theme}</div>
-          <div className="col-span-3">{t.title}</div>
-          <div className="col-span-2">{t.group}</div>
-          <div className="col-span-5">{t.stage}</div>
-        </div>
-        {productions.map((p, i) => {
-          const theme = THEMES.find((t) => t.id === p.themeId);
-          const names = (p.sections.members || "").split(",").map((n) => n.trim()).filter(Boolean);
-          const stageInfo = STAGES.find((s) => s.id === p.sections.stage);
-          return (
-            <div
-              key={p.id}
-              className="grid grid-cols-12 px-4 py-3 items-center text-sm"
-              style={{ background: i % 2 === 0 ? C.card : C.panel, borderTop: `1px solid ${C.line}` }}
-            >
-              <div className="col-span-2 flex items-center gap-2">
-                <span style={{ width: 8, height: 8, borderRadius: 999, background: theme.color, flexShrink: 0 }} />
-                <span style={{ color: C.ink, fontFamily: FONTS.body, fontWeight: 600 }}>
-                  {theme.name}
-                  <span className="block text-xs" style={{ color: C.mute, fontWeight: 500, whiteSpace: "nowrap" }}>{t.groupN(groupNumber(p.id))}</span>
-                </span>
-              </div>
-              <div className="col-span-3" style={{ color: p.sections.filmTitle ? C.ink : C.mute, fontFamily: FONTS.body }}>
-                {p.sections.filmTitle || t.noTitle}
-              </div>
-              <div className="col-span-2" style={{ color: names.length ? C.sub : C.mute, fontFamily: FONTS.body }}>
-                {names.length ? names.join(", ") : t.notAllocated}
-              </div>
-              <div className="col-span-5">
-                <StageTrack stage={p.sections.stage} compact />
-                <div className="text-xs mt-1" style={{ color: C.mute, fontFamily: FONTS.mono }}>
-                  {stageInfo?.label}
-                </div>
-              </div>
-            </div>
-          );
-        })}
-      </div>
-    </div>
-  );
-}
-
-/* ---------------------------------------------------------------------- */
 /*  CONTACTS VIEW                                                           */
 /* ---------------------------------------------------------------------- */
 function ContactsView() {
@@ -2433,7 +2378,6 @@ export default function EmicProductionDatabase() {
   const NAV = [
     { key: "brief", label: t.navBrief, icon: BookOpen },
     { key: "productions", label: t.navProductions, icon: FolderOpen },
-    { key: "schedule", label: t.navSchedule, icon: ListChecks },
     { key: "contacts", label: t.navContacts, icon: Phone },
     { key: "notes", label: t.navNotes, icon: StickyNote },
   ];
@@ -2500,7 +2444,6 @@ export default function EmicProductionDatabase() {
           </>
         )}
 
-        {view === "schedule" && <ScheduleView productions={productions} />}
         {view === "contacts" && <ContactsView />}
         {view === "notes" && <NotesView />}
       </main>

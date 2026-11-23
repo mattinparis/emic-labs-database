@@ -163,10 +163,6 @@ export const STRINGS = {
     calendarIntro: "The real EMIC session calendar for this project. Every production's Stage, set on its Overview tab, is one of these checkpoints.",
     examplesIntro: "Two worked examples from a previous season, kept here for reference. Click either to see the full production dossier: pitch, budget, shot list, callsheets, and jury prep.",
 
-    // Schedule view
-    scheduleIntro: "Every group's current stage against the real EMIC calendar, in one view.",
-    theme: "Theme",
-    title: "Title",
 
     // School notes
     staffOnly: "Staff only. This section has its own separate code, not the general edit code.",
@@ -178,7 +174,6 @@ export const STRINGS = {
     // Root
     navBrief: "Project Brief",
     navProductions: "Productions",
-    navSchedule: "Schedule",
     navContacts: "Contacts",
     navNotes: "School Notes",
     season: "Master II Audiovisuel · Season 2026 / 2027",
@@ -332,9 +327,6 @@ export const STRINGS = {
     calendarIntro: "Le calendrier réel des séances EMIC pour ce projet. L'étape de chaque production, réglée dans son onglet Vue d'ensemble, correspond à l'un de ces jalons.",
     examplesIntro: "Deux exemples complets d'une saison précédente, conservés ici pour référence. Cliquez sur l'un d'eux pour voir le dossier de production complet : pitch, budget, liste des plans, feuilles de service et préparation jury.",
 
-    scheduleIntro: "L'étape actuelle de chaque groupe par rapport au calendrier réel de l'EMIC, en une seule vue.",
-    theme: "Thème",
-    title: "Titre",
 
     staffOnly: "Réservé à l'équipe pédagogique. Cette section a son propre code, différent du code de modification général.",
     notesCodePh: "Code des notes",
@@ -344,7 +336,6 @@ export const STRINGS = {
 
     navBrief: "Brief du projet",
     navProductions: "Productions",
-    navSchedule: "Planning",
     navContacts: "Contacts",
     navNotes: "Notes de l'école",
     season: "Master II Audiovisuel · Saison 2026 / 2027",
@@ -387,16 +378,16 @@ export const FR_THEMES = {
 };
 
 export const FR_STAGES = {
-  oct: { label: "Octobre", detail: "Lancement, brief créatif, groupes et thèmes validés" },
-  nov: { label: "Novembre", detail: "R&D" },
-  dec: { label: "Décembre", detail: "R&D" },
-  jan: { label: "Janvier", detail: "Note d'intention" },
-  feb: { label: "Février", detail: "Préproduction et préparation du tournage" },
+  oct: { label: "Octobre", detail: "Introduction et brief" },
+  nov: { label: "Novembre", detail: "Groupes et thèmes · Atelier questions-réponses" },
+  dec: { label: "Décembre", detail: "R&D · Note d'intention, repérages, scénario" },
+  jan: { label: "Janvier", detail: "Préproduction · Pitch, décors, budget" },
+  feb: { label: "Février", detail: "Préproduction · Pitch, décors, budget, contrats, moyens" },
   mar: { label: "Mars", detail: "Tournage" },
-  apr: { label: "Avril", detail: "Tournage + postproduction" },
-  may: { label: "Mai", detail: "Postproduction et projection du premier montage" },
-  jun: { label: "Juin", detail: "Montage final et mixage" },
-  jul: { label: "Juillet", detail: "Projection finale et jury" },
+  apr: { label: "Avril", detail: "Tournage / postproduction" },
+  may: { label: "Mai", detail: "1re projection · Visionnage interne du premier montage" },
+  jun: { label: "Juin", detail: "Postproduction · Mixage final et exports, projection finale devant le jury" },
+  jul: { label: "Juillet", detail: "Débrief · Séance complète sur la saison" },
 };
 
 export const FR_TABS = {
