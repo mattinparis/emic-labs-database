@@ -1,0 +1,583 @@
+/* ---------------------------------------------------------------------- */
+/*  TRANSLATIONS, English / French                                          */
+/*  STRINGS holds every interface label. The FR_* objects hold French      */
+/*  versions of the fixed reference content defined in App.jsx (themes,    */
+/*  calendar, brief, worked examples). What groups type into the live      */
+/*  productions is stored as written and is never translated.              */
+/* ---------------------------------------------------------------------- */
+export const STRINGS = {
+  en: {
+    // Edit gate & codes
+    editingUnlocked: "Editing unlocked",
+    enterCode: "Enter code to edit",
+    editCodePh: "Edit code",
+    incorrectCode: "Incorrect code.",
+    checking: "Checking…",
+    unlock: "Unlock",
+
+    // Common actions
+    save: "Save",
+    saved: "Saved",
+    cancel: "Cancel",
+    edit: "Edit",
+    close: "Close",
+    total: "Total",
+    tbc: "TBC",
+    nothingRecorded: "Nothing recorded here.",
+    noneRecorded: "None recorded.",
+    nothingListed: "Nothing listed yet.",
+    unnamed: "Unnamed",
+
+    // Title & group
+    yourFilm: "Your film",
+    workingTitle: "Working title",
+    taglinePh: "One-line tagline",
+    noTitle: "No title yet",
+    editTitle: "Edit title & tagline",
+    addTitle: "Add your title & tagline",
+    group: "Group",
+    assignedGroup: "Assigned group",
+    membersPh: "e.g. Camille Dubois, Léo Martin, Nina Chen",
+    separateCommas: "Separate names with commas.",
+    notRecordedExample: "Not recorded for this example",
+    notAllocated: "Not yet allocated",
+    allocate: "Allocate students",
+
+    // Budget
+    budgetNote: "This total reflects what you've actually spent. Money raised and any surplus returned are tracked separately, on Overview, Edit details.",
+    noBudgetLines: "No budget lines yet. Add one for every expense.",
+    item: "Item",
+    amountEuros: "Amount, euros",
+    budgetItemPh: "e.g. DJI Mic 2 rental",
+    removeLine: "Remove line",
+    addLine: "Add line",
+    noBudgetExample: "No budget lines recorded for this example.",
+
+    // Schedule
+    scheduleNote: "One row per real EMIC session. Tick it off, add the actual date if it differs from the target month, and a short note. Your Stage shown on your card is set separately, on Overview, Edit details.",
+    markDone: (label) => `Mark ${label} done`,
+    actualDatePh: "Actual date, e.g. Dec 12",
+    notePh: "Note, e.g. what happened",
+    noScheduleExample: "No schedule recorded for this example.",
+
+    // Shot list
+    noShots: "No shots yet. Add one for every shot in the film.",
+    location: "Location",
+    durationPh: "Duration, e.g. 0:00 to 0:12",
+    framing: "Framing",
+    charactersPh: "Characters in shot",
+    actionPh: "Action & description",
+    removeShot: "Remove shot",
+    addShot: "Add shot",
+    noShotsExample: "No shots recorded for this example.",
+    characters: "Characters",
+
+    // Production stats
+    editDetailsTitle: "Edit production details",
+    stage: "Stage",
+    length: "Length",
+    cast: "Cast",
+    shoot: "Shoot",
+    lengthPh: "1 min 57 sec",
+    castPh: "2 actors",
+    shootPh: "2 days",
+    budgetRaised: "Budget raised, euros",
+    surplusReturnedEuros: "Surplus returned, euros",
+    leaveBlank: "Leave blank until known",
+    emicBase: "EMIC base",
+    raised: "Raised",
+    surplusReturned: "Surplus returned",
+    editDetails: "Edit details",
+
+    // Call sheets
+    noCallsheets: "No call sheets yet. Add one for each day of shooting.",
+    dayPh: (n) => `Day ${n}, e.g. Shoot day 1`,
+    removeCallsheet: "Remove call sheet",
+    scenesCovered: "Scenes covered",
+    notes: "Notes",
+    daySchedule: "Day schedule",
+    whatHappensPh: "What happens, e.g. Actors arrive, Lunch break, RTS",
+    removeScheduleItem: "Remove schedule item",
+    addScheduleItem: "Add schedule item",
+    addCallsheet: "Add call sheet",
+    noCallsheetsExample: "No call sheets recorded for this example.",
+    callsheetN: (n) => `Call sheet ${n}`,
+
+    // Cast & crew
+    noCast: "No cast or crew added yet. Add everyone involved, actors and crew together.",
+    name: "Name",
+    role: "Role",
+    phone: "Phone",
+    email: "Email",
+    rolePh: "e.g. Director, Actor",
+    removePerson: "Remove person",
+    addPerson: "Add person",
+    noCastExample: "No cast or crew recorded for this example.",
+
+    // Equipment & props
+    techEquipment: "Technical equipment",
+    propsAccessories: "Props & accessories",
+    equipPh: "e.g. iPhone 15 Pro, DJI Mic 2, gimbal",
+    propsPh: "e.g. prop phone, tote bag, costume piece",
+    removeItem: "Remove item",
+    addItem: "Add item",
+
+    // Print view
+    notCompleted: "Not yet completed.",
+    back: "Back",
+    printPdf: "Print / Save as PDF",
+    untitled: "Untitled production",
+    printFooter: "EMIC LAB SHORTS, EMIC LABS DATABASE V12, Master II Audiovisuel, Season 2026 / 2027",
+    productionDetails: "Production details",
+    pitchOutline: "Pitch & outline",
+    script: "Script",
+    noScript: "No script submitted.",
+    budget: "Budget",
+    noBudget: "No budget lines recorded.",
+    shootingSchedule: "Shooting schedule",
+    actual: (d) => `(actual: ${d})`,
+    noSchedule: "No schedule recorded.",
+    shotList: "Shot list",
+    noShotsRec: "No shots recorded.",
+    castCrew: "Cast & crew",
+    noCastRec: "No cast or crew recorded.",
+    equipProps: "Equipment & props",
+    callSheets: "Call sheets",
+    noCallsheetsRec: "No call sheets recorded.",
+    juryPrep: "Jury prep",
+
+    // Production detail
+    exportPdfTitle: "Export this production as a PDF",
+    exportPdf: "Export PDF",
+    pitchPh: "Write the logline, statement of intent, and dramatic structure here.",
+    scriptPh: "Paste or write the full script here, scene headings, action, and dialogue.",
+    noScriptExample: "No script submitted for this example.",
+    juryPh: "Anticipate the jury's questions and draft your answers.",
+
+    // Cards
+    noTitleClick: "No title yet. Click to start.",
+    filled: (a, b) => `${a}/${b} filled`,
+
+    // Brief
+    calendarIntro: "The real EMIC session calendar for this project. Every production's Stage, set on its Overview tab, is one of these checkpoints.",
+    examplesIntro: "Two worked examples from a previous season, kept here for reference. Click either to see the full production dossier: pitch, budget, shot list, callsheets, and jury prep.",
+
+    // Schedule view
+    scheduleIntro: "Every group's current stage against the real EMIC calendar, in one view.",
+    theme: "Theme",
+    title: "Title",
+
+    // School notes
+    staffOnly: "Staff only. This section has its own separate code, not the general edit code.",
+    notesCodePh: "Notes code",
+    notesVisible: "Meant for Matt and team only. Only visible to whoever knows this section's code.",
+    loading: "Loading.",
+    notesPh: "Internal notes: group concerns, budget flags, jury scheduling, anything not meant for students.",
+
+    // Root
+    navBrief: "Project Brief",
+    navProductions: "Productions",
+    navSchedule: "Schedule",
+    navContacts: "Contacts",
+    navNotes: "School Notes",
+    season: "Master II Audiovisuel · Season 2026 / 2027",
+    searchPh: "Search by theme, title, or student name.",
+    loadingEdits: "Loading saved edits.",
+    noMatch: (q) => `No productions match "${q}".`,
+    footer: "Shared live database. Edits save for everyone as you go.",
+    language: "Language",
+  },
+
+  fr: {
+    editingUnlocked: "Modification déverrouillée",
+    enterCode: "Code pour modifier",
+    editCodePh: "Code de modification",
+    incorrectCode: "Code incorrect.",
+    checking: "Vérification…",
+    unlock: "Déverrouiller",
+
+    save: "Enregistrer",
+    saved: "Enregistré",
+    cancel: "Annuler",
+    edit: "Modifier",
+    close: "Fermer",
+    total: "Total",
+    tbc: "À confirmer",
+    nothingRecorded: "Rien n'a été renseigné ici.",
+    noneRecorded: "Rien de renseigné.",
+    nothingListed: "Rien pour l'instant.",
+    unnamed: "Sans nom",
+
+    yourFilm: "Votre film",
+    workingTitle: "Titre provisoire",
+    taglinePh: "Accroche en une ligne",
+    noTitle: "Pas encore de titre",
+    editTitle: "Modifier le titre et l'accroche",
+    addTitle: "Ajouter votre titre et votre accroche",
+    group: "Groupe",
+    assignedGroup: "Groupe attribué",
+    membersPh: "ex. Camille Dubois, Léo Martin, Nina Chen",
+    separateCommas: "Séparez les noms par des virgules.",
+    notRecordedExample: "Non renseigné pour cet exemple",
+    notAllocated: "Pas encore attribué",
+    allocate: "Attribuer des étudiants",
+
+    budgetNote: "Ce total correspond à ce que vous avez réellement dépensé. Les fonds levés et l'éventuel excédent reversé se renseignent à part, dans Vue d'ensemble, Modifier les infos.",
+    noBudgetLines: "Aucune ligne de budget pour l'instant. Ajoutez-en une par dépense.",
+    item: "Poste",
+    amountEuros: "Montant, en euros",
+    budgetItemPh: "ex. Location DJI Mic 2",
+    removeLine: "Supprimer la ligne",
+    addLine: "Ajouter une ligne",
+    noBudgetExample: "Aucune ligne de budget pour cet exemple.",
+
+    scheduleNote: "Une ligne par séance EMIC réelle. Cochez-la, ajoutez la date réelle si elle diffère du mois prévu, et une courte note. L'étape affichée sur votre fiche se règle à part, dans Vue d'ensemble, Modifier les infos.",
+    markDone: (label) => `Marquer ${label} comme terminé`,
+    actualDatePh: "Date réelle, ex. 12 déc.",
+    notePh: "Note, ex. ce qui s'est passé",
+    noScheduleExample: "Aucun planning pour cet exemple.",
+
+    noShots: "Aucun plan pour l'instant. Ajoutez-en un pour chaque plan du film.",
+    location: "Décor",
+    durationPh: "Durée, ex. 0:00 à 0:12",
+    framing: "Cadrage",
+    charactersPh: "Personnages dans le plan",
+    actionPh: "Action et description",
+    removeShot: "Supprimer le plan",
+    addShot: "Ajouter un plan",
+    noShotsExample: "Aucun plan pour cet exemple.",
+    characters: "Personnages",
+
+    editDetailsTitle: "Modifier les infos de production",
+    stage: "Étape",
+    length: "Durée",
+    cast: "Casting",
+    shoot: "Tournage",
+    lengthPh: "1 min 57 s",
+    castPh: "2 comédiens",
+    shootPh: "2 jours",
+    budgetRaised: "Fonds levés, en euros",
+    surplusReturnedEuros: "Excédent reversé, en euros",
+    leaveBlank: "Laisser vide tant que c'est inconnu",
+    emicBase: "Dotation EMIC",
+    raised: "Fonds levés",
+    surplusReturned: "Excédent reversé",
+    editDetails: "Modifier les infos",
+
+    noCallsheets: "Aucune feuille de service pour l'instant. Ajoutez-en une par jour de tournage.",
+    dayPh: (n) => `Jour ${n}, ex. Tournage jour 1`,
+    removeCallsheet: "Supprimer la feuille de service",
+    scenesCovered: "Plans couverts",
+    notes: "Notes",
+    daySchedule: "Programme de la journée",
+    whatHappensPh: "Ce qui se passe, ex. Arrivée des comédiens, Pause déjeuner, PAT",
+    removeScheduleItem: "Supprimer l'horaire",
+    addScheduleItem: "Ajouter un horaire",
+    addCallsheet: "Ajouter une feuille de service",
+    noCallsheetsExample: "Aucune feuille de service pour cet exemple.",
+    callsheetN: (n) => `Feuille de service ${n}`,
+
+    noCast: "Personne n'a encore été ajouté. Ajoutez tous les participants, comédiens et équipe ensemble.",
+    name: "Nom",
+    role: "Rôle",
+    phone: "Téléphone",
+    email: "E-mail",
+    rolePh: "ex. Réalisation, Comédien",
+    removePerson: "Supprimer la personne",
+    addPerson: "Ajouter une personne",
+    noCastExample: "Aucun casting ni équipe pour cet exemple.",
+
+    techEquipment: "Matériel technique",
+    propsAccessories: "Accessoires",
+    equipPh: "ex. iPhone 15 Pro, DJI Mic 2, stabilisateur",
+    propsPh: "ex. faux téléphone, tote bag, élément de costume",
+    removeItem: "Supprimer l'élément",
+    addItem: "Ajouter un élément",
+
+    notCompleted: "Pas encore rempli.",
+    back: "Retour",
+    printPdf: "Imprimer / Enregistrer en PDF",
+    untitled: "Production sans titre",
+    printFooter: "EMIC LAB SHORTS, EMIC LABS DATABASE V12, Master II Audiovisuel, Saison 2026 / 2027",
+    productionDetails: "Infos de production",
+    pitchOutline: "Pitch et synopsis",
+    script: "Scénario",
+    noScript: "Aucun scénario remis.",
+    budget: "Budget",
+    noBudget: "Aucune ligne de budget.",
+    shootingSchedule: "Plan de tournage",
+    actual: (d) => `(date réelle : ${d})`,
+    noSchedule: "Aucun planning.",
+    shotList: "Liste des plans",
+    noShotsRec: "Aucun plan.",
+    castCrew: "Casting et équipe",
+    noCastRec: "Aucun casting ni équipe.",
+    equipProps: "Matériel et accessoires",
+    callSheets: "Feuilles de service",
+    noCallsheetsRec: "Aucune feuille de service.",
+    juryPrep: "Préparation jury",
+
+    exportPdfTitle: "Exporter cette production en PDF",
+    exportPdf: "Exporter en PDF",
+    pitchPh: "Écrivez ici le pitch, la note d'intention et la structure dramatique.",
+    scriptPh: "Collez ou écrivez ici le scénario complet : en-têtes de séquence, action et dialogues.",
+    noScriptExample: "Aucun scénario remis pour cet exemple.",
+    juryPh: "Anticipez les questions du jury et préparez vos réponses.",
+
+    noTitleClick: "Pas encore de titre. Cliquez pour commencer.",
+    filled: (a, b) => `${a}/${b} remplis`,
+
+    calendarIntro: "Le calendrier réel des séances EMIC pour ce projet. L'étape de chaque production, réglée dans son onglet Vue d'ensemble, correspond à l'un de ces jalons.",
+    examplesIntro: "Deux exemples complets d'une saison précédente, conservés ici pour référence. Cliquez sur l'un d'eux pour voir le dossier de production complet : pitch, budget, liste des plans, feuilles de service et préparation jury.",
+
+    scheduleIntro: "L'étape actuelle de chaque groupe par rapport au calendrier réel de l'EMIC, en une seule vue.",
+    theme: "Thème",
+    title: "Titre",
+
+    staffOnly: "Réservé à l'équipe pédagogique. Cette section a son propre code, différent du code de modification général.",
+    notesCodePh: "Code des notes",
+    notesVisible: "Réservé à Matt et à l'équipe. Visible uniquement par les personnes qui connaissent le code de cette section.",
+    loading: "Chargement.",
+    notesPh: "Notes internes : points d'attention sur les groupes, alertes budget, planning du jury, tout ce qui n'est pas destiné aux étudiants.",
+
+    navBrief: "Brief du projet",
+    navProductions: "Productions",
+    navSchedule: "Planning",
+    navContacts: "Contacts",
+    navNotes: "Notes de l'école",
+    season: "Master II Audiovisuel · Saison 2026 / 2027",
+    searchPh: "Rechercher par thème, titre ou nom d'étudiant.",
+    loadingEdits: "Chargement des modifications enregistrées.",
+    noMatch: (q) => `Aucune production ne correspond à « ${q} ».`,
+    footer: "Base de données partagée en direct. Vos modifications sont enregistrées pour tout le monde au fur et à mesure.",
+    language: "Langue",
+  },
+};
+
+/* ---------------------------------------------------------------------- */
+/*  FRENCH REFERENCE CONTENT, keyed by the same ids as App.jsx             */
+/* ---------------------------------------------------------------------- */
+export const FR_THEMES = {
+  "moral-dilemma": {
+    name: "Dilemme moral",
+    prompt: "Un personnage fait face à un choix où chaque option a un prix, et doit trancher sur le moment, sans avoir le temps de réfléchir.",
+  },
+  "the-wait": {
+    name: "L'Attente",
+    prompt: "Un personnage, ou le public, est suspendu dans l'attente : d'un résultat, d'une personne, d'un moment qui viendra peut-être, ou pas.",
+  },
+  "human-connection": {
+    name: "Lien humain",
+    prompt: "Comment la technologie, la distance ou un objet du quotidien transforme, ou révèle, la relation entre deux personnes.",
+  },
+  "the-debt": {
+    name: "La Dette",
+    prompt: "Un personnage doit quelque chose à quelqu'un, sur le plan moral, affectif ou matériel, et doit rembourser, ignorer ou affronter cette dette.",
+  },
+  "uncanny-familiar": {
+    name: "L'Inquiétante familiarité",
+    prompt: "Quelque chose cloche, sans bruit, sous un décor ordinaire : jamais vraiment expliqué, seulement ressenti.",
+  },
+  "second-chances": {
+    name: "Seconde chance",
+    prompt: "Un personnage reçoit une occasion inattendue de réparer, de refaire, ou de dire ce qu'il n'a pas dit la première fois.",
+  },
+};
+
+export const FR_STAGES = {
+  oct: { label: "Octobre", detail: "Lancement, brief créatif, groupes et thèmes validés" },
+  nov: { label: "Novembre", detail: "R&D" },
+  dec: { label: "Décembre", detail: "R&D" },
+  jan: { label: "Janvier", detail: "Note d'intention" },
+  feb: { label: "Février", detail: "Préproduction et préparation du tournage" },
+  mar: { label: "Mars", detail: "Tournage" },
+  apr: { label: "Avril", detail: "Tournage + postproduction" },
+  may: { label: "Mai", detail: "Postproduction et projection du premier montage" },
+  jun: { label: "Juin", detail: "Montage final et mixage" },
+  jul: { label: "Juillet", detail: "Projection finale et jury" },
+};
+
+export const FR_TABS = {
+  overview: "Vue d'ensemble",
+  pitch: "Pitch et synopsis",
+  script: "Scénario",
+  castcrew: "Casting et équipe",
+  budget: "Budget",
+  schedule: "Plan de tournage",
+  shotlist: "Liste des plans",
+  equipment: "Matériel et accessoires",
+  callsheets: "Feuilles de service",
+  jury: "Préparation jury",
+};
+
+export const FR_CONTACT_ROLES = {
+  "Project Lead": "Responsable du projet",
+};
+
+export const FR_DOSSIER = {
+  brief: {
+    label: "Brief créatif",
+    body: [
+      ["Contexte", "Vous êtes mandatés pour produire un court métrage de fiction. Il ne s'agit pas d'un film institutionnel : c'est une œuvre de fiction autonome qui répond à un brief créatif précis."],
+      ["Ce qui compte", "La production prime sur la réalisation. Organisation, rigueur et maîtrise technique avant tout : livrer dans les délais, sans dépassement de budget, avec une stratégie de financement validée, et être prêts à défendre vos choix devant un jury de professionnels de l'audiovisuel."],
+      ["Livrables attendus", "Film postproduit (.mp4, H.264, 1080p min.) · Note d'intention (1 page max.) · Dossier de production (budget, plan de tournage, liste technique) · Présentation orale devant le jury (5 min + 5 min de questions)"],
+      ["Ce que le jury évalue", "Maîtrise de la production · Pertinence du traitement narratif · Cohérence technique · Capacité à défendre vos choix"],
+    ],
+  },
+  specs: {
+    label: "Cahier des charges technique",
+    body: [
+      ["Format et durée", "2 min (± 10 s) · 16:9, 1080p minimum · Stéréo, masterisé à –14 LUFS · .MP4, H.264 ou H.265 · générique inclus dans les 2 minutes"],
+      ["Matériel", "iPhone (caméra native ou Filmic Pro) · stabilisateur motorisé et/ou trépied autorisés · son direct (au moins 1 scène synchrone en décor réel) · lumière naturelle privilégiée (au moins 1 scène)"],
+      ["Décors imposés", "1 séquence en EXTÉRIEUR · 1 séquence en INTÉRIEUR · 1 séquence EN TRANSPORT. Valable pour tous les groupes, quel que soit le thème."],
+      ["Casting et musique", "5 comédiens max., 2 min. · musique libre de droits (CC) ou originale avec cession de droits signée"],
+      ["Modèle de budget", "Dotation de base EMIC de 1 000 €, un point de départ, pas un plafond. Les groupes lèvent des fonds supplémentaires, justifient chaque dépense et reversent tout excédent à l'EMIC. La rigueur financière est évaluée par le jury."],
+    ],
+  },
+  calendar: { label: "Calendrier" },
+  examples: { label: "Exemples de productions" },
+};
+
+/* Worked examples: the fields below replace the English ones in
+   EXAMPLE_PRODUCTIONS. Anything not listed (ids, amounts, names) is kept. */
+export const FR_EXAMPLES = {
+  line9: {
+    filmTitle: "LIGNE 9",
+    tagline: "Dilemme moral en temps réel dans le métro parisien",
+    cast: "2 (Yasmine, 24 ans, et Sylvie, 52 ans)",
+    shootDays: "3 jours (1 de repérage + 2 de tournage)",
+    length: "1 min 57 s",
+    sections: {
+      pitch:
+        "Notre lecture du thème « Le mensonge ordinaire » ne repose pas sur un mensonge prononcé, mais sur un mensonge d'inaction : celui qu'on se raconte pour justifier de ne pas agir.\n\nYasmine, 24 ans, prend le métro pour se rendre à son entretien à l'EMIC. Elle est en retard. Dans la rame, une femme fait un malaise. Le film dure exactement le temps de ce trajet. En 2 minutes, Yasmine n'a pas le temps de réfléchir : elle doit ressentir, décider, agir.\n\nLe plan final : Yasmine assise, vue de dos, tandis que le métro repart. Elle est restée. Le dilemme, ce n'est pas ce qu'on fait, mais ce qu'on a failli faire.\n\nStructure dramatique\nEXPOSITION (0:00 à 0:28) : On installe l'univers intérieur de Yasmine. Sylvie est assise en arrière-plan, rien n'est encore visible.\nÉLÉMENT DÉCLENCHEUR (0:28 à 0:50) : Sylvie s'affaisse. Le malaise s'installe, en silence.\nDILEMME (0:50 à 1:22) : Yasmine hésite devant le signal d'alarme. Le métro ralentit.\nBASCULE (1:22 à 1:45) : Sylvie tombe. Le choix n'existe plus. Yasmine agit.\nRÉSOLUTION OUVERTE (1:45 à 1:57) : Les portes se ferment. Fondu au noir.",
+      budget: [
+        { label: "Autorisation RATP", amount: "0" },
+        { label: "DJI Mic 2, location 2 jours", amount: "55" },
+        { label: "Accessoires iPhone", amount: "42" },
+        { label: "Comédienne, Yasmine", amount: "150" },
+        { label: "Comédienne, Sylvie", amount: "100" },
+        { label: "Transport + costumes", amount: "122" },
+        { label: "Repas de l'équipe, 2 jours", amount: "172" },
+        { label: "Postproduction, mixage son + étalonnage", amount: "400" },
+        { label: "Imprévus", amount: "179" },
+      ],
+      schedule: [
+        { stageId: "oct", done: true, date: "3 oct.", note: "Lancement, brief créatif et groupes validés" },
+        { stageId: "nov", done: true, date: "20 nov.", note: "R&D et recherches en cours" },
+        { stageId: "dec", done: true, date: "14 déc.", note: "Suite de la R&D et de l'écriture" },
+        { stageId: "jan", done: true, date: "29 janv.", note: "Note d'intention remise" },
+        { stageId: "feb", done: true, date: "26 févr.", note: "Préproduction, budget et plan de tournage validés" },
+        { stageId: "mar", done: true, date: "25 mars", note: "Tournage terminé, rushes remis" },
+        { stageId: "apr", done: true, date: "10 avr.", note: "Début de la postproduction, premier ours" },
+        { stageId: "may", done: true, date: "28 mai", note: "Premier montage présenté" },
+        { stageId: "jun", done: true, date: "20 juin", note: "Montage final et mixage verrouillés" },
+        { stageId: "jul", done: true, date: "2 juil.", note: "Projection finale et présentation au jury" },
+      ],
+      script:
+        "LIGNE 9\n\nUn court métrage, sans dialogue.\n\nEXT. QUAI AÉRIEN DE LA LIGNE 9 – MATIN\n\nLumière du matin à travers les poutrelles d'acier. Des voyageurs se croisent dans les deux sens.\n\nYASMINE, 24 ans, sac à dos sur une épaule, entre dans le champ en montant l'escalier. Elle regarde son téléphone : 8h54. Elle presse le pas.\n\nQUAI – CONTINU\n\nYasmine attend au bord du quai, écouteurs dans les oreilles, en se balançant d'un pied sur l'autre. Gros plan sur son téléphone : toujours 8h54.\n\nUne rame entre en station. Les portes s'ouvrent.\n\nINT. RAME DE MÉTRO – CONTINU\n\nYasmine monte, balaie la rame du regard, s'assoit. En face, SYLVIE, 52 ans, est assise, son sac sur les genoux, les yeux fermés, parfaitement immobile.\n\nLes portes se ferment. Le métro démarre.\n\nLes mains de Sylvie reposent sur la bandoulière de son sac, les jointures blanches.\n\nLe regard de Yasmine glisse vers son téléphone. La musique joue doucement dans ses oreilles.\n\nUn temps. Yasmine retire un écouteur. Quelque chose a changé dans l'air. Elle jette un œil.\n\nLa respiration de Sylvie a changé, courte et irrégulière. Son sac glisse de ses genoux jusqu'au sol. Elle ne le ramasse pas.\n\nGros plan sur le téléphone de Yasmine : 8h55.\n\nLe regard de Yasmine file vers le signal d'alarme près de la porte. Revient sur Sylvie.\n\nElle se lève à moitié. Hésite. Se rassoit.\n\nLe métro commence à ralentir à l'approche de la station suivante.\n\nSylvie bascule vers l'avant et s'effondre doucement dans l'allée.\n\nLe choix a disparu. Yasmine est déjà à genoux, elle tire le signal d'alarme et prend la main de Sylvie.\n\nUne annonce enregistrée de la RATP passe dans les haut-parleurs, indifférente à ce qui se joue en dessous.\n\nLe métro s'arrête. Les portes s'ouvrent. Des voyageurs entrent, s'arrêtent, découvrent la scène, réagissent chacun à leur manière.\n\nYasmine ne lève pas les yeux. Elle reste exactement où elle est, la main de Sylvie dans la sienne.\n\nLes portes se ferment.\n\nFONDU AU NOIR.",
+      shotlist: [
+        { number: "01", location: "Ext., entrée du métro", duration: "0:00 à 0:06", framing: "Plan large", characters: "Yasmine", description: "Plan d'ensemble, lumière du matin à travers les poutrelles, voyageurs qui se croisent." },
+        { number: "02", location: "Ext., entrée du métro", duration: "0:06 à 0:12", framing: "Épaule", characters: "Yasmine", description: "Yasmine sort de l'escalier, regarde son téléphone, presse le pas." },
+        { number: "03", location: "Quai", duration: "0:12 à 0:16", framing: "Insert", characters: "", description: "Gros plan sur l'écran du téléphone, 8h54." },
+        { number: "04", location: "Quai", duration: "0:16 à 0:22", framing: "Fixe", characters: "Yasmine", description: "Yasmine attend, écouteurs dans les oreilles. La rame arrive, les portes s'ouvrent." },
+        { number: "05", location: "Rame", duration: "0:22 à 0:28", framing: "Plan large", characters: "Yasmine, Sylvie", description: "Yasmine monte, cherche une place, s'assoit en face de Sylvie." },
+        { number: "06", location: "Rame", duration: "0:28 à 0:34", framing: "Plan moyen", characters: "Sylvie", description: "Sylvie est assise, immobile, sac sur les genoux, yeux fermés." },
+        { number: "07", location: "Rame", duration: "0:34 à 0:42", framing: "Insert", characters: "Sylvie", description: "Gros plan sur les mains de Sylvie, jointures blanches sur la bandoulière." },
+        { number: "08", location: "Rame", duration: "0:42 à 0:50", framing: "Gros plan", characters: "Yasmine", description: "Yasmine retire un écouteur, jette un œil, hésitante." },
+        { number: "09", location: "Rame", duration: "0:50 à 0:58", framing: "Insert", characters: "Sylvie", description: "Le sac de Sylvie glisse de ses genoux jusqu'au sol, sans qu'elle s'en aperçoive." },
+        { number: "10", location: "Rame", duration: "0:58 à 1:06", framing: "Insert", characters: "", description: "Gros plan sur l'écran du téléphone, 8h55." },
+        { number: "11", location: "Rame", duration: "1:06 à 1:14", framing: "Longue focale", characters: "Yasmine", description: "Yasmine se lève à moitié, la main près du signal d'alarme." },
+        { number: "12", location: "Rame", duration: "1:14 à 1:22", framing: "Longue focale", characters: "Yasmine", description: "Elle se rassoit, hésite. Le métro commence à ralentir." },
+        { number: "13", location: "Rame", duration: "1:22 à 1:31", framing: "Caméra à l'épaule", characters: "Yasmine, Sylvie", description: "Sylvie s'effondre dans l'allée. Yasmine tombe à genoux." },
+        { number: "14", location: "Rame", duration: "1:31 à 1:38", framing: "Insert", characters: "", description: "Gros plan sur le signal d'alarme, actionné. Annonce RATP en son direct." },
+        { number: "15", location: "Rame", duration: "1:38 à 1:45", framing: "Point de vue de Sylvie", characters: "Yasmine", description: "Le visage de Yasmine en contre-plongée, calme, concentré." },
+        { number: "16", location: "Rame", duration: "1:45 à 1:51", framing: "Plan large", characters: "Yasmine, Sylvie", description: "Les portes s'ouvrent, des voyageurs entrent, s'arrêtent, réagissent." },
+        { number: "17", location: "Rame", duration: "1:51 à 1:57", framing: "Plan large fixe", characters: "Yasmine, Sylvie", description: "Yasmine reste exactement où elle est, la main de Sylvie dans la sienne. Les portes se ferment, fondu au noir." },
+      ],
+      callsheets: [
+        {
+          day: "Jour 1, repérage", location: "Quai aérien de la ligne 9 (station exacte à confirmer avec le contact RATP)",
+          schedule: [{ time: "07:00", who: "Réalisation, 1er assistanat / production, prise de son" }],
+          scenes: "Valider le cadrage des plans 01 à 04, vérifier le créneau de lumière naturelle", notes: "",
+        },
+        {
+          day: "Jour 2, tournage jour 1 sur 2", location: "",
+          schedule: [
+            { time: "06:00", who: "Arrivée, régie" },
+            { time: "07:00", who: "Arrivée, équipe technique et comédiennes" },
+            { time: "08:00", who: "PAT, plans 1, 2, 3" },
+            { time: "11:00", who: "Installation pour les plans 5 à 10" },
+            { time: "11:30", who: "PAT, plans 5 à 7" },
+            { time: "13:00", who: "Pause déjeuner" },
+            { time: "14:00", who: "PAT, plans 8 à 10" },
+            { time: "16:00", who: "Fin de journée pour les comédiennes" },
+            { time: "16:30", who: "Plans de coupe, plans d'ambiance et sons seuls" },
+          ],
+          scenes: "Plans 01 à 10", notes: "Plan B prévu en cas de retard de la RATP",
+        },
+        {
+          day: "Jour 3, tournage jour 2 sur 2", location: "",
+          schedule: [
+            { time: "06:00", who: "Arrivée, régie" },
+            { time: "07:00", who: "Arrivée, équipe technique et comédiennes" },
+            { time: "08:00", who: "PAT, plans 11 à 15" },
+            { time: "11:00", who: "Fin de journée pour les comédiennes" },
+            { time: "11:30", who: "Plans de coupe, plans d'ambiance et sons seuls" },
+          ],
+          scenes: "Plans 11 à 17", notes: "",
+        },
+      ],
+      castCrew: [
+        { name: "Yasmine", role: "Comédienne, rôle principal", phone: "", email: "" },
+        { name: "Sylvie", role: "Comédienne", phone: "", email: "" },
+        { name: "Inès", role: "Réalisation", phone: "", email: "" },
+        { name: "Nathan", role: "Production", phone: "", email: "" },
+        { name: "Théo", role: "1er assistanat réalisation", phone: "", email: "" },
+        { name: "Manon", role: "Prise de son", phone: "", email: "" },
+        { name: "David", role: "Régie", phone: "", email: "" },
+        { name: "Daphné", role: "Image", phone: "", email: "" },
+      ],
+      equipment: ["iPhone, caméra native", "DJI Mic 2", "Stabilisateur (gimbal)", "Complément téléobjectif", "2 panneaux LED", "2 micros HF", "1 perche", "1 moniteur portable"],
+      props: ["Le sac de Sylvie, doit glisser proprement pour le plan 09", "Le sac à dos de Yasmine", "Le manteau de Sylvie"],
+      jury:
+        "Q La fin ouverte : un choix ou un manque de courage ?\n→ Totalement assumée : le public repart en se demandant ce qu'il aurait fait.\n\nQ Une autorisation RATP en 3 semaines ?\n→ Déposée à M2, relancée à M3, confirmée à M5. Plan B prêt dans une station aérienne.\n\nQ Seulement 2 comédiennes ?\n→ Contrainte assumée : la solitude de Yasmine devait être réelle.\n\nQ Pas de dialogue : une limite ou un choix ?\n→ Un choix total : le dilemme se lit sur son visage, sans barrière de la langue.",
+    },
+  },
+  lastcut: {
+    filmTitle: "LA DERNIÈRE COUPE",
+    tagline: "Contenu de marque avec le Salon ÉCLAT",
+    cast: "3 (client·e, coiffeur·euse, figurant·e)",
+    shootDays: "1 jour de repérage + 1 jour de tournage (en dehors des heures d'ouverture)",
+    length: "2 min",
+    sections: {
+      pitch:
+        "Obtenir un décor gratuitement en échange d'un contenu exploitable, c'est exactement le modèle économique du contenu de marque indépendant. Le Salon ÉCLAT a accepté après un pitch de 20 minutes, à condition que le film fonctionne sur Instagram et TikTok sans nuire à l'image du salon, et cette contrainte a façonné tout le projet.\n\nTension à tenir tout du long : la fiction veut du grain, du naturalisme et une fin ambiguë ; ÉCLAT veut une image propre, une prestation irréprochable de son personnel et un sourire apaisé dans le miroir. Compromis trouvé dans le plan final.",
+      schedule: [
+        { stageId: "oct", done: true, date: "", note: "Lancement, brief créatif et groupes validés" },
+        { stageId: "nov", done: true, date: "", note: "R&D et recherches en cours" },
+        { stageId: "dec", done: true, date: "", note: "Groupes et rôles validés" },
+        { stageId: "jan", done: true, date: "", note: "Note d'intention remise" },
+        { stageId: "feb", done: true, date: "", note: "Partenariat ÉCLAT confirmé" },
+        { stageId: "mar", done: true, date: "", note: "Tournage terminé" },
+        { stageId: "apr", done: true, date: "", note: "Début de la postproduction" },
+        { stageId: "may", done: false, date: "", note: "Premier montage en revue, en attente de validation du client" },
+        { stageId: "jun", done: false, date: "", note: "" },
+        { stageId: "jul", done: false, date: "", note: "" },
+      ],
+      callsheets: [
+        {
+          day: "Jour 1, tournage", location: "Salon ÉCLAT, Paris 18e",
+          schedule: [{ time: "À confirmer", who: "À coordonner avec la direction du salon, obligatoirement en dehors des heures d'ouverture" }],
+          scenes: "", notes: "Aucun plan de sol sale, de miroir taché ou de salon en désordre.",
+        },
+      ],
+      castCrew: [
+        { name: "", role: "Client·e, comédien·ne", phone: "", email: "" },
+        { name: "", role: "Coiffeur·euse, comédien·ne", phone: "", email: "" },
+        { name: "", role: "Figurant·e", phone: "", email: "" },
+      ],
+      equipment: ["iPhone, caméra native", "Trépied"],
+      props: ["Blouse de salon", "Outils de coiffure, fournis par le salon"],
+    },
+  },
+};

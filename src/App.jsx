@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, createContext, useContext } from "react";
 import {
   Search, LayoutGrid, Sparkles, Wallet, Calendar, Film, ClipboardList,
   MessageCircle, X, Check, Clock, ChevronRight, BookOpen, FolderOpen, Users,
@@ -6,6 +6,7 @@ import {
 } from "lucide-react";
 import { LOGO_B64 } from "./logo.js";
 import { supabase } from "./supabaseClient.js";
+import { STRINGS, FR_THEMES, FR_STAGES, FR_TABS, FR_CONTACT_ROLES, FR_DOSSIER, FR_EXAMPLES } from "./i18n.js";
 
 /* ---------------------------------------------------------------------- */
 /*  DESIGN TOKENS                                                          */
@@ -373,6 +374,46 @@ async function saveSchoolNotes(pin, content) {
 }
 
 /* ---------------------------------------------------------------------- */
+/*  LANGUAGE, EN / FR. Components read their labels (t) and the localized  */
+/*  reference content (themes, stages, brief, examples) from this context. */
+/*  The choice is remembered per browser. Text groups type into their      */
+/*  productions is shown as written, in whatever language they used.       */
+/* ---------------------------------------------------------------------- */
+const LangContext = createContext(null);
+function useI18n() {
+  return useContext(LangContext);
+}
+
+function buildLocale(lang) {
+  const t = STRINGS[lang];
+  if (lang !== "fr") {
+    return { lang, t, THEMES, STAGES, TABS, CONTACTS, DOSSIER_SECTIONS, EXAMPLE_PRODUCTIONS };
+  }
+  return {
+    lang,
+    t,
+    THEMES: THEMES.map((th) => ({ ...th, ...FR_THEMES[th.id] })),
+    STAGES: STAGES.map((s) => ({ ...s, ...FR_STAGES[s.id] })),
+    TABS: TABS.map((tab) => ({ ...tab, label: FR_TABS[tab.key] })),
+    CONTACTS: CONTACTS.map((c) => ({ ...c, role: FR_CONTACT_ROLES[c.role] || c.role })),
+    DOSSIER_SECTIONS: DOSSIER_SECTIONS.map((d) => ({ ...d, ...FR_DOSSIER[d.key] })),
+    EXAMPLE_PRODUCTIONS: EXAMPLE_PRODUCTIONS.map((ex) => {
+      const fr = FR_EXAMPLES[ex.id] || {};
+      return { ...ex, ...fr, sections: { ...ex.sections, ...fr.sections } };
+    }),
+  };
+}
+
+function readSavedLang() {
+  try {
+    const saved = localStorage.getItem("emic-lang");
+    return saved === "fr" ? "fr" : "en";
+  } catch {
+    return "en";
+  }
+}
+
+/* ---------------------------------------------------------------------- */
 /*  GOOGLE FONTS, injected once. Bebas Neue for title-card display type,   */
 /*  IBM Plex Mono for timecodes and budget figures, Inter for body copy.   */
 /* ---------------------------------------------------------------------- */
@@ -431,12 +472,33 @@ function Pill({ active, onClick, children, style }) {
   );
 }
 
+/* EN / FR switch, shown in the top bar and in every production's header. */
+function LangToggle() {
+  const { lang, setLang, t } = useI18n();
+  return (
+    <div role="group" aria-label={t.language} className="flex rounded-md overflow-hidden flex-shrink-0" style={{ border: `1px solid ${C.line}` }}>
+      {["en", "fr"].map((l) => (
+        <button
+          key={l}
+          onClick={() => setLang(l)}
+          aria-pressed={lang === l}
+          className="px-2.5 py-2 text-xs font-bold tracking-wide"
+          style={{ background: lang === l ? C.gold : C.card, color: lang === l ? "#141414" : C.sub, fontFamily: FONTS.body }}
+        >
+          {l.toUpperCase()}
+        </button>
+      ))}
+    </div>
+  );
+}
+
 /* ---------------------------------------------------------------------- */
 /*  EDIT GATE, a friction gate (not real security) for the shared PIN.     */
 /*  Browsing is always open; entering the code unlocks editing for the     */
 /*  rest of this browser session (see app_settings.edit_pin).              */
 /* ---------------------------------------------------------------------- */
 function EditGate({ unlocked, onUnlock, onLock }) {
+  const { t } = useI18n();
   const [open, setOpen] = useState(false);
   const [value, setValue] = useState("");
   const [err, setErr] = useState(false);
@@ -449,7 +511,7 @@ function EditGate({ unlocked, onUnlock, onLock }) {
         className="flex items-center gap-1.5 px-3 py-2 rounded-md text-xs font-semibold"
         style={{ background: C.card, border: `1px solid ${C.line}`, color: "#27AE60", fontFamily: FONTS.body }}
       >
-        <Lock size={13} /> Editing unlocked
+        <Lock size={13} /> {t.editingUnlocked}
       </button>
     );
   }
@@ -474,7 +536,7 @@ function EditGate({ unlocked, onUnlock, onLock }) {
         className="flex items-center gap-1.5 px-3 py-2 rounded-md text-xs font-semibold"
         style={{ background: C.card, border: `1px solid ${C.line}`, color: C.sub, fontFamily: FONTS.body }}
       >
-        <Lock size={13} /> Enter code to edit
+        <Lock size={13} /> {t.enterCode}
       </button>
       {open && (
         <div
@@ -487,13 +549,13 @@ function EditGate({ unlocked, onUnlock, onLock }) {
             value={value}
             onChange={(e) => { setValue(e.target.value); setErr(false); }}
             onKeyDown={(e) => { if (e.key === "Enter") attempt(); }}
-            placeholder="Edit code"
+            placeholder={t.editCodePh}
             className="w-full rounded-md px-3 py-2 text-sm outline-none mb-2"
             style={{ background: C.card, border: `1px solid ${err ? "#E74C3C" : C.line}`, color: C.ink, fontFamily: FONTS.body }}
           />
           {err && (
             <div className="text-xs mb-2" style={{ color: "#E74C3C", fontFamily: FONTS.body }}>
-              Incorrect code.
+              {t.incorrectCode}
             </div>
           )}
           <button
@@ -502,7 +564,7 @@ function EditGate({ unlocked, onUnlock, onLock }) {
             className="w-full px-3 py-1.5 rounded-md text-xs font-bold uppercase tracking-wide"
             style={{ background: C.gold, color: "#141414", opacity: checking ? 0.6 : 1 }}
           >
-            {checking ? "Checking…" : "Unlock"}
+            {checking ? t.checking : t.unlock}
           </button>
         </div>
       )}
@@ -511,6 +573,7 @@ function EditGate({ unlocked, onUnlock, onLock }) {
 }
 
 function StageTrack({ stage, compact }) {
+  const { STAGES } = useI18n();
   const idx = STAGES.findIndex((s) => s.id === stage);
   return (
     <div className="flex items-center gap-1">
@@ -548,6 +611,7 @@ function ThemeTag({ theme }) {
 /*  EDITABLE / STATIC SECTION, long-form tab content                       */
 /* ---------------------------------------------------------------------- */
 function EditableSection({ value, placeholder, onSave }) {
+  const { t } = useI18n();
   const [draft, setDraft] = useState(value || "");
   const [dirty, setDirty] = useState(false);
   const [saved, setSaved] = useState(false);
@@ -586,11 +650,11 @@ function EditableSection({ value, placeholder, onSave }) {
             cursor: dirty ? "pointer" : "default",
           }}
         >
-          Save
+          {t.save}
         </button>
         {saved && !dirty && (
           <span className="text-xs flex items-center gap-1" style={{ color: "#27AE60" }}>
-            <Check size={13} /> Saved
+            <Check size={13} /> {t.saved}
           </span>
         )}
       </div>
@@ -599,12 +663,13 @@ function EditableSection({ value, placeholder, onSave }) {
 }
 
 function StaticSection({ value, emptyText }) {
+  const { t } = useI18n();
   return (
     <div
       className="w-full rounded-lg p-4 text-sm leading-relaxed"
       style={{ background: C.card, border: `1px solid ${C.line}`, color: C.ink, whiteSpace: "pre-wrap", fontFamily: FONTS.body }}
     >
-      {value && value.trim() ? value : <span style={{ color: C.mute }}>{emptyText || "Nothing recorded here."}</span>}
+      {value && value.trim() ? value : <span style={{ color: C.mute }}>{emptyText || t.nothingRecorded}</span>}
     </div>
   );
 }
@@ -613,6 +678,7 @@ function StaticSection({ value, emptyText }) {
 /*  FILM TITLE & TAGLINE, the group's own creative identity within theme   */
 /* ---------------------------------------------------------------------- */
 function FilmTitleEditor({ title, tagline, onSave, readOnly }) {
+  const { t } = useI18n();
   const [editing, setEditing] = useState(false);
   const [draftTitle, setDraftTitle] = useState(title || "");
   const [draftTagline, setDraftTagline] = useState(tagline || "");
@@ -637,11 +703,11 @@ function FilmTitleEditor({ title, tagline, onSave, readOnly }) {
   if (editing) {
     return (
       <div className="mt-3 rounded-lg p-3" style={{ background: C.card, border: `1px solid ${C.line}` }}>
-        <div className="text-xs font-bold uppercase tracking-widest mb-2" style={{ color: C.gold, fontFamily: FONTS.body }}>Your film</div>
+        <div className="text-xs font-bold uppercase tracking-widest mb-2" style={{ color: C.gold, fontFamily: FONTS.body }}>{t.yourFilm}</div>
         <input
           value={draftTitle}
           onChange={(e) => setDraftTitle(e.target.value)}
-          placeholder="Working title"
+          placeholder={t.workingTitle}
           className="w-full mb-2 rounded-md px-3 py-2 text-sm outline-none"
           style={{ background: C.bg, border: `1px solid ${C.line}`, color: C.ink, fontFamily: FONTS.body }}
           autoFocus
@@ -649,7 +715,7 @@ function FilmTitleEditor({ title, tagline, onSave, readOnly }) {
         <input
           value={draftTagline}
           onChange={(e) => setDraftTagline(e.target.value)}
-          placeholder="One-line tagline"
+          placeholder={t.taglinePh}
           className="w-full rounded-md px-3 py-2 text-sm outline-none"
           style={{ background: C.bg, border: `1px solid ${C.line}`, color: C.ink, fontFamily: FONTS.body }}
         />
@@ -663,14 +729,14 @@ function FilmTitleEditor({ title, tagline, onSave, readOnly }) {
             className="px-3 py-1.5 rounded-md text-xs font-bold uppercase tracking-wide"
             style={{ background: C.gold, color: "#141414" }}
           >
-            Save
+            {t.save}
           </button>
           <button
             onClick={() => { setDraftTitle(title || ""); setDraftTagline(tagline || ""); setEditing(false); }}
             className="px-3 py-1.5 rounded-md text-xs font-semibold"
             style={{ color: C.mute }}
           >
-            Cancel
+            {t.cancel}
           </button>
         </div>
       </div>
@@ -685,14 +751,14 @@ function FilmTitleEditor({ title, tagline, onSave, readOnly }) {
           {tagline && <p className="text-sm mt-1" style={{ color: C.sub, fontFamily: FONTS.body }}>{tagline}</p>}
         </>
       ) : (
-        <p className="text-sm" style={{ color: C.mute, fontFamily: FONTS.body }}>No title yet</p>
+        <p className="text-sm" style={{ color: C.mute, fontFamily: FONTS.body }}>{t.noTitle}</p>
       )}
       <button onClick={() => setEditing(true)} className="text-xs font-semibold underline mt-1" style={{ color: C.sub, fontFamily: FONTS.body }}>
-        {title ? "Edit title & tagline" : "Add your title & tagline"}
+        {title ? t.editTitle : t.addTitle}
       </button>
       {saved && (
         <span className="text-xs ml-2 inline-flex items-center gap-1" style={{ color: "#27AE60" }}>
-          <Check size={12} /> Saved
+          <Check size={12} /> {t.saved}
         </span>
       )}
     </div>
@@ -703,6 +769,7 @@ function FilmTitleEditor({ title, tagline, onSave, readOnly }) {
 /*  GROUP MEMBERS, compact editable roster, visible across every tab       */
 /* ---------------------------------------------------------------------- */
 function GroupMembers({ value, onSave, readOnly }) {
+  const { t } = useI18n();
   const [editing, setEditing] = useState(false);
   const [draft, setDraft] = useState(value || "");
   const [saved, setSaved] = useState(false);
@@ -717,7 +784,7 @@ function GroupMembers({ value, onSave, readOnly }) {
     return (
       <div className="mt-3 flex items-start gap-2 flex-wrap">
         <span className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-widest" style={{ color: C.gold }}>
-          <Users size={13} /> Group
+          <Users size={13} /> {t.group}
         </span>
         {names.length > 0 ? (
           names.map((n) => (
@@ -726,7 +793,7 @@ function GroupMembers({ value, onSave, readOnly }) {
             </span>
           ))
         ) : (
-          <span className="text-xs" style={{ color: C.mute }}>Not recorded for this example</span>
+          <span className="text-xs" style={{ color: C.mute }}>{t.notRecordedExample}</span>
         )}
       </div>
     );
@@ -736,18 +803,18 @@ function GroupMembers({ value, onSave, readOnly }) {
     return (
       <div className="mt-3 rounded-lg p-3" style={{ background: C.card, border: `1px solid ${C.line}` }}>
         <div className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-widest mb-2" style={{ color: C.gold }}>
-          <Users size={13} /> Assigned group
+          <Users size={13} /> {t.assignedGroup}
         </div>
         <input
           value={draft}
           onChange={(e) => setDraft(e.target.value)}
-          placeholder="e.g. Camille Dubois, Léo Martin, Nina Chen"
+          placeholder={t.membersPh}
           className="w-full rounded-md px-3 py-2 text-sm outline-none"
           style={{ background: C.bg, border: `1px solid ${C.line}`, color: C.ink, fontFamily: FONTS.body }}
           autoFocus
         />
         <div className="text-xs mt-1.5 mb-3" style={{ color: C.mute }}>
-          Separate names with commas.
+          {t.separateCommas}
         </div>
         <div className="flex items-center gap-2">
           <button
@@ -759,14 +826,14 @@ function GroupMembers({ value, onSave, readOnly }) {
             className="px-3 py-1.5 rounded-md text-xs font-bold uppercase tracking-wide"
             style={{ background: C.gold, color: "#141414" }}
           >
-            Save
+            {t.save}
           </button>
           <button
             onClick={() => { setDraft(value || ""); setEditing(false); }}
             className="px-3 py-1.5 rounded-md text-xs font-semibold"
             style={{ color: C.mute }}
           >
-            Cancel
+            {t.cancel}
           </button>
         </div>
       </div>
@@ -776,7 +843,7 @@ function GroupMembers({ value, onSave, readOnly }) {
   return (
     <div className="mt-3 flex items-start gap-2 flex-wrap">
       <span className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-widest" style={{ color: C.gold }}>
-        <Users size={13} /> Assigned group
+        <Users size={13} /> {t.assignedGroup}
       </span>
       {names.length > 0 ? (
         names.map((n) => (
@@ -785,14 +852,14 @@ function GroupMembers({ value, onSave, readOnly }) {
           </span>
         ))
       ) : (
-        <span className="text-xs" style={{ color: C.mute }}>Not yet allocated</span>
+        <span className="text-xs" style={{ color: C.mute }}>{t.notAllocated}</span>
       )}
       <button onClick={() => setEditing(true)} className="text-xs font-semibold underline" style={{ color: C.sub }}>
-        {names.length > 0 ? "Edit" : "Allocate students"}
+        {names.length > 0 ? t.edit : t.allocate}
       </button>
       {saved && (
         <span className="text-xs flex items-center gap-1" style={{ color: "#27AE60" }}>
-          <Check size={12} /> Saved
+          <Check size={12} /> {t.saved}
         </span>
       )}
     </div>
@@ -835,6 +902,7 @@ function formatEuro(n) {
 }
 
 function BudgetEditor({ rows, onSave }) {
+  const { t } = useI18n();
   const [list, setList] = useState(rows || []);
   const [dirty, setDirty] = useState(false);
   const [saved, setSaved] = useState(false);
@@ -853,35 +921,35 @@ function BudgetEditor({ rows, onSave }) {
   return (
     <div>
       <p className="text-xs mb-3" style={{ color: C.mute, fontFamily: FONTS.body }}>
-        This total reflects what you've actually spent. Money raised and any surplus returned are tracked separately, on Overview, Edit details.
+        {t.budgetNote}
       </p>
-      {list.length === 0 && <p className="text-sm mb-4" style={{ color: C.mute, fontFamily: FONTS.body }}>No budget lines yet. Add one for every expense.</p>}
+      {list.length === 0 && <p className="text-sm mb-4" style={{ color: C.mute, fontFamily: FONTS.body }}>{t.noBudgetLines}</p>}
       {list.length > 0 && (
         <div className="grid grid-cols-12 gap-2 px-1 mb-1 text-xs font-bold uppercase tracking-wide" style={{ color: C.mute }}>
-          <div className="col-span-8">Item</div>
-          <div className="col-span-3">Amount, euros</div>
+          <div className="col-span-8">{t.item}</div>
+          <div className="col-span-3">{t.amountEuros}</div>
         </div>
       )}
       <div className="space-y-2">
         {list.map((row, i) => (
           <div key={i} className="grid grid-cols-12 gap-2 items-center rounded-lg p-2" style={{ background: C.card, border: `1px solid ${C.line}` }}>
-            <input value={row.label} onChange={(e) => update(i, "label", e.target.value)} placeholder="e.g. DJI Mic 2 rental" className="col-span-8 rounded-md px-2 py-1.5 text-sm outline-none" style={inputStyle} />
+            <input value={row.label} onChange={(e) => update(i, "label", e.target.value)} placeholder={t.budgetItemPh} className="col-span-8 rounded-md px-2 py-1.5 text-sm outline-none" style={inputStyle} />
             <input value={row.amount} onChange={(e) => update(i, "amount", e.target.value)} placeholder="0" className="col-span-3 rounded-md px-2 py-1.5 text-sm outline-none" style={{ ...inputStyle, fontFamily: FONTS.mono }} />
-            <button onClick={() => removeRow(i)} style={{ color: C.mute }} className="col-span-1 flex justify-center" aria-label="Remove line"><Trash2 size={14} /></button>
+            <button onClick={() => removeRow(i)} style={{ color: C.mute }} className="col-span-1 flex justify-center" aria-label={t.removeLine}><Trash2 size={14} /></button>
           </div>
         ))}
       </div>
 
       {list.length > 0 && (
         <div className="flex items-center justify-between rounded-lg px-4 py-3 mt-3" style={{ background: C.cardAlt, border: `1px solid ${C.gold}55` }}>
-          <span className="text-xs font-bold uppercase tracking-widest" style={{ color: C.gold }}>Total</span>
+          <span className="text-xs font-bold uppercase tracking-widest" style={{ color: C.gold }}>{t.total}</span>
           <span className="text-lg font-bold" style={{ color: C.gold, fontFamily: FONTS.mono }}>{formatEuro(sumBudget(list))}</span>
         </div>
       )}
 
       <div className="flex items-center gap-3 mt-4">
         <button onClick={addRow} className="flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-bold uppercase tracking-wide" style={{ background: C.cardAlt, color: C.gold, border: `1px solid ${C.line}` }}>
-          <Plus size={13} /> Add line
+          <Plus size={13} /> {t.addLine}
         </button>
         <button
           disabled={!dirty}
@@ -889,11 +957,11 @@ function BudgetEditor({ rows, onSave }) {
           className="px-4 py-1.5 rounded-md text-xs font-bold uppercase tracking-wide"
           style={{ background: dirty ? C.gold : C.line, color: dirty ? "#141414" : C.mute, cursor: dirty ? "pointer" : "default" }}
         >
-          Save
+          {t.save}
         </button>
         {saved && !dirty && (
           <span className="text-xs flex items-center gap-1" style={{ color: "#27AE60" }}>
-            <Check size={13} /> Saved
+            <Check size={13} /> {t.saved}
           </span>
         )}
       </div>
@@ -902,10 +970,11 @@ function BudgetEditor({ rows, onSave }) {
 }
 
 function StaticBudget({ rows }) {
+  const { t } = useI18n();
   if (!rows || rows.length === 0) {
     return (
       <div className="w-full rounded-lg p-4 text-sm" style={{ background: C.card, border: `1px solid ${C.line}`, color: C.mute, fontFamily: FONTS.body }}>
-        No budget lines recorded for this example.
+        {t.noBudgetExample}
       </div>
     );
   }
@@ -920,7 +989,7 @@ function StaticBudget({ rows }) {
         ))}
       </div>
       <div className="flex items-center justify-between rounded-lg px-4 py-3 mt-3" style={{ background: C.cardAlt, border: `1px solid ${C.gold}55` }}>
-        <span className="text-xs font-bold uppercase tracking-widest" style={{ color: C.gold }}>Total</span>
+        <span className="text-xs font-bold uppercase tracking-widest" style={{ color: C.gold }}>{t.total}</span>
         <span className="text-lg font-bold" style={{ color: C.gold, fontFamily: FONTS.mono }}>{formatEuro(sumBudget(rows))}</span>
       </div>
     </div>
@@ -936,6 +1005,7 @@ function blankScheduleChecklist() {
 }
 
 function ScheduleChecklistEditor({ checklist, onSave }) {
+  const { t, STAGES } = useI18n();
   const rows = STAGES.map((s) => {
     const existing = (checklist || []).find((r) => r.stageId === s.id);
     return existing || { stageId: s.id, done: false, date: "", note: "" };
@@ -960,7 +1030,7 @@ function ScheduleChecklistEditor({ checklist, onSave }) {
   return (
     <div>
       <p className="text-xs mb-3" style={{ color: C.mute, fontFamily: FONTS.body }}>
-        One row per real EMIC session. Tick it off, add the actual date if it differs from the target month, and a short note. Your Stage shown on your card is set separately, on Overview, Edit details.
+        {t.scheduleNote}
       </p>
       <div className="space-y-2">
         {list.map((row) => {
@@ -973,7 +1043,7 @@ function ScheduleChecklistEditor({ checklist, onSave }) {
                   checked={row.done}
                   onChange={(e) => update(row.stageId, "done", e.target.checked)}
                   style={{ width: 16, height: 16, accentColor: "#27AE60", flexShrink: 0 }}
-                  aria-label={`Mark ${s.label} done`}
+                  aria-label={t.markDone(s.label)}
                 />
                 <div className="flex-1">
                   <span className="text-sm font-bold" style={{ color: row.done ? "#27AE60" : C.ink, fontFamily: FONTS.body }}>{s.label}</span>
@@ -983,14 +1053,14 @@ function ScheduleChecklistEditor({ checklist, onSave }) {
                 <input
                   value={row.date}
                   onChange={(e) => update(row.stageId, "date", e.target.value)}
-                  placeholder="Actual date, e.g. Dec 12"
+                  placeholder={t.actualDatePh}
                   className="rounded-md px-2 py-1.5 text-sm outline-none"
                   style={{ ...inputStyle, fontFamily: FONTS.mono }}
                 />
                 <input
                   value={row.note}
                   onChange={(e) => update(row.stageId, "note", e.target.value)}
-                  placeholder="Note, e.g. what happened"
+                  placeholder={t.notePh}
                   className="col-span-2 rounded-md px-2 py-1.5 text-sm outline-none"
                   style={inputStyle}
                 />
@@ -1006,11 +1076,11 @@ function ScheduleChecklistEditor({ checklist, onSave }) {
           className="px-4 py-1.5 rounded-md text-xs font-bold uppercase tracking-wide"
           style={{ background: dirty ? C.gold : C.line, color: dirty ? "#141414" : C.mute, cursor: dirty ? "pointer" : "default" }}
         >
-          Save
+          {t.save}
         </button>
         {saved && !dirty && (
           <span className="text-xs flex items-center gap-1" style={{ color: "#27AE60" }}>
-            <Check size={13} /> Saved
+            <Check size={13} /> {t.saved}
           </span>
         )}
       </div>
@@ -1019,10 +1089,11 @@ function ScheduleChecklistEditor({ checklist, onSave }) {
 }
 
 function StaticScheduleChecklist({ checklist }) {
+  const { t, STAGES } = useI18n();
   if (!checklist || checklist.length === 0) {
     return (
       <div className="w-full rounded-lg p-4 text-sm" style={{ background: C.card, border: `1px solid ${C.line}`, color: C.mute, fontFamily: FONTS.body }}>
-        No schedule recorded for this example.
+        {t.noScheduleExample}
       </div>
     );
   }
@@ -1055,6 +1126,7 @@ function blankShotRow() {
 }
 
 function ShotListEditor({ rows, onSave }) {
+  const { t } = useI18n();
   const [list, setList] = useState(rows || []);
   const [dirty, setDirty] = useState(false);
   const [saved, setSaved] = useState(false);
@@ -1072,29 +1144,29 @@ function ShotListEditor({ rows, onSave }) {
 
   return (
     <div>
-      {list.length === 0 && <p className="text-sm mb-4" style={{ color: C.mute, fontFamily: FONTS.body }}>No shots yet. Add one for every shot in the film.</p>}
+      {list.length === 0 && <p className="text-sm mb-4" style={{ color: C.mute, fontFamily: FONTS.body }}>{t.noShots}</p>}
       <div className="space-y-3">
         {list.map((row, i) => (
           <div key={i} className="rounded-lg p-3" style={{ background: C.card, border: `1px solid ${C.line}` }}>
             <div className="flex items-start gap-2 mb-2">
               <div className="grid grid-cols-12 gap-2 flex-1">
                 <input value={row.number} onChange={(e) => update(i, "number", e.target.value)} placeholder="01" className="col-span-1 rounded-md px-2 py-1.5 text-sm outline-none" style={{ ...inputStyle, fontFamily: FONTS.mono }} />
-                <input value={row.location} onChange={(e) => update(i, "location", e.target.value)} placeholder="Location" className="col-span-4 rounded-md px-2 py-1.5 text-sm outline-none" style={inputStyle} />
-                <input value={row.duration} onChange={(e) => update(i, "duration", e.target.value)} placeholder="Duration, e.g. 0:00 to 0:12" className="col-span-4 rounded-md px-2 py-1.5 text-sm outline-none" style={{ ...inputStyle, fontFamily: FONTS.mono }} />
-                <input value={row.framing} onChange={(e) => update(i, "framing", e.target.value)} placeholder="Framing" className="col-span-3 rounded-md px-2 py-1.5 text-sm outline-none" style={inputStyle} />
+                <input value={row.location} onChange={(e) => update(i, "location", e.target.value)} placeholder={t.location} className="col-span-4 rounded-md px-2 py-1.5 text-sm outline-none" style={inputStyle} />
+                <input value={row.duration} onChange={(e) => update(i, "duration", e.target.value)} placeholder={t.durationPh} className="col-span-4 rounded-md px-2 py-1.5 text-sm outline-none" style={{ ...inputStyle, fontFamily: FONTS.mono }} />
+                <input value={row.framing} onChange={(e) => update(i, "framing", e.target.value)} placeholder={t.framing} className="col-span-3 rounded-md px-2 py-1.5 text-sm outline-none" style={inputStyle} />
               </div>
-              <button onClick={() => removeRow(i)} style={{ color: C.mute }} aria-label="Remove shot" className="flex-shrink-0 mt-1.5"><Trash2 size={14} /></button>
+              <button onClick={() => removeRow(i)} style={{ color: C.mute }} aria-label={t.removeShot} className="flex-shrink-0 mt-1.5"><Trash2 size={14} /></button>
             </div>
             <div className="grid grid-cols-3 gap-2">
-              <input value={row.characters} onChange={(e) => update(i, "characters", e.target.value)} placeholder="Characters in shot" className="rounded-md px-2 py-1.5 text-sm outline-none" style={inputStyle} />
-              <input value={row.description} onChange={(e) => update(i, "description", e.target.value)} placeholder="Action & description" className="col-span-2 rounded-md px-2 py-1.5 text-sm outline-none" style={inputStyle} />
+              <input value={row.characters} onChange={(e) => update(i, "characters", e.target.value)} placeholder={t.charactersPh} className="rounded-md px-2 py-1.5 text-sm outline-none" style={inputStyle} />
+              <input value={row.description} onChange={(e) => update(i, "description", e.target.value)} placeholder={t.actionPh} className="col-span-2 rounded-md px-2 py-1.5 text-sm outline-none" style={inputStyle} />
             </div>
           </div>
         ))}
       </div>
       <div className="flex items-center gap-3 mt-4">
         <button onClick={addRow} className="flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-bold uppercase tracking-wide" style={{ background: C.cardAlt, color: C.gold, border: `1px solid ${C.line}` }}>
-          <Plus size={13} /> Add shot
+          <Plus size={13} /> {t.addShot}
         </button>
         <button
           disabled={!dirty}
@@ -1102,11 +1174,11 @@ function ShotListEditor({ rows, onSave }) {
           className="px-4 py-1.5 rounded-md text-xs font-bold uppercase tracking-wide"
           style={{ background: dirty ? C.gold : C.line, color: dirty ? "#141414" : C.mute, cursor: dirty ? "pointer" : "default" }}
         >
-          Save
+          {t.save}
         </button>
         {saved && !dirty && (
           <span className="text-xs flex items-center gap-1" style={{ color: "#27AE60" }}>
-            <Check size={13} /> Saved
+            <Check size={13} /> {t.saved}
           </span>
         )}
       </div>
@@ -1115,10 +1187,11 @@ function ShotListEditor({ rows, onSave }) {
 }
 
 function StaticShotList({ rows }) {
+  const { t } = useI18n();
   if (!rows || rows.length === 0) {
     return (
       <div className="w-full rounded-lg p-4 text-sm" style={{ background: C.card, border: `1px solid ${C.line}`, color: C.mute, fontFamily: FONTS.body }}>
-        No shots recorded for this example.
+        {t.noShotsExample}
       </div>
     );
   }
@@ -1133,7 +1206,7 @@ function StaticShotList({ rows }) {
             {r.framing && <span style={{ color: C.mute, fontSize: 12 }}>· {r.framing}</span>}
           </div>
           <div>{r.description}</div>
-          {r.characters && <div style={{ color: C.sub, fontSize: 13, marginTop: 2 }}>Characters: {r.characters}</div>}
+          {r.characters && <div style={{ color: C.sub, fontSize: 13, marginTop: 2 }}>{t.characters}: {r.characters}</div>}
         </div>
       ))}
     </div>
@@ -1141,6 +1214,7 @@ function StaticShotList({ rows }) {
 }
 
 function ProductionStats({ stage, length, cast, shootDays, budgetEmic, budgetRaised, surplus, readOnly, onSave }) {
+  const { t, STAGES } = useI18n();
   const [editing, setEditing] = useState(false);
   const [d, setD] = useState({ stage, length, cast, shootDays, budgetRaised, surplus });
   const [saved, setSaved] = useState(false);
@@ -1155,9 +1229,9 @@ function ProductionStats({ stage, length, cast, shootDays, budgetEmic, budgetRai
   if (editing) {
     return (
       <div className="rounded-lg p-4 space-y-3" style={{ background: C.card, border: `1px solid ${C.line}` }}>
-        <div className="text-xs font-bold uppercase tracking-widest" style={{ color: C.gold }}>Edit production details</div>
+        <div className="text-xs font-bold uppercase tracking-widest" style={{ color: C.gold }}>{t.editDetailsTitle}</div>
         <div>
-          <label className="text-xs" style={{ color: C.mute }}>Stage</label>
+          <label className="text-xs" style={{ color: C.mute }}>{t.stage}</label>
           <select
             value={d.stage}
             onChange={(e) => setD({ ...d, stage: e.target.value })}
@@ -1169,30 +1243,30 @@ function ProductionStats({ stage, length, cast, shootDays, budgetEmic, budgetRai
         </div>
         <div className="grid grid-cols-3 gap-2">
           <div>
-            <label className="text-xs" style={{ color: C.mute }}>Length</label>
-            <input value={d.length} onChange={(e) => setD({ ...d, length: e.target.value })} placeholder="1 min 57 sec"
+            <label className="text-xs" style={{ color: C.mute }}>{t.length}</label>
+            <input value={d.length} onChange={(e) => setD({ ...d, length: e.target.value })} placeholder={t.lengthPh}
               className="w-full mt-1 rounded-md px-3 py-2 text-sm outline-none" style={{ background: C.bg, border: `1px solid ${C.line}`, color: C.ink, fontFamily: FONTS.body }} />
           </div>
           <div>
-            <label className="text-xs" style={{ color: C.mute }}>Cast</label>
-            <input value={d.cast} onChange={(e) => setD({ ...d, cast: e.target.value })} placeholder="2 actors"
+            <label className="text-xs" style={{ color: C.mute }}>{t.cast}</label>
+            <input value={d.cast} onChange={(e) => setD({ ...d, cast: e.target.value })} placeholder={t.castPh}
               className="w-full mt-1 rounded-md px-3 py-2 text-sm outline-none" style={{ background: C.bg, border: `1px solid ${C.line}`, color: C.ink, fontFamily: FONTS.body }} />
           </div>
           <div>
-            <label className="text-xs" style={{ color: C.mute }}>Shoot</label>
-            <input value={d.shootDays} onChange={(e) => setD({ ...d, shootDays: e.target.value })} placeholder="2 days"
+            <label className="text-xs" style={{ color: C.mute }}>{t.shoot}</label>
+            <input value={d.shootDays} onChange={(e) => setD({ ...d, shootDays: e.target.value })} placeholder={t.shootPh}
               className="w-full mt-1 rounded-md px-3 py-2 text-sm outline-none" style={{ background: C.bg, border: `1px solid ${C.line}`, color: C.ink, fontFamily: FONTS.body }} />
           </div>
         </div>
         <div className="grid grid-cols-2 gap-2">
           <div>
-            <label className="text-xs" style={{ color: C.mute }}>Budget raised, euros</label>
+            <label className="text-xs" style={{ color: C.mute }}>{t.budgetRaised}</label>
             <input value={d.budgetRaised} onChange={(e) => setD({ ...d, budgetRaised: e.target.value })} placeholder="0" inputMode="numeric"
               className="w-full mt-1 rounded-md px-3 py-2 text-sm outline-none" style={{ background: C.bg, border: `1px solid ${C.line}`, color: C.ink, fontFamily: FONTS.body }} />
           </div>
           <div>
-            <label className="text-xs" style={{ color: C.mute }}>Surplus returned, euros</label>
-            <input value={d.surplus} onChange={(e) => setD({ ...d, surplus: e.target.value })} placeholder="Leave blank until known" inputMode="numeric"
+            <label className="text-xs" style={{ color: C.mute }}>{t.surplusReturnedEuros}</label>
+            <input value={d.surplus} onChange={(e) => setD({ ...d, surplus: e.target.value })} placeholder={t.leaveBlank} inputMode="numeric"
               className="w-full mt-1 rounded-md px-3 py-2 text-sm outline-none" style={{ background: C.bg, border: `1px solid ${C.line}`, color: C.ink, fontFamily: FONTS.body }} />
           </div>
         </div>
@@ -1202,14 +1276,14 @@ function ProductionStats({ stage, length, cast, shootDays, budgetEmic, budgetRai
             className="px-3 py-1.5 rounded-md text-xs font-bold uppercase tracking-wide"
             style={{ background: C.gold, color: "#141414" }}
           >
-            Save
+            {t.save}
           </button>
           <button
             onClick={() => { setD({ stage, length, cast, shootDays, budgetRaised, surplus }); setEditing(false); }}
             className="px-3 py-1.5 rounded-md text-xs font-semibold"
             style={{ color: C.mute }}
           >
-            Cancel
+            {t.cancel}
           </button>
         </div>
       </div>
@@ -1219,14 +1293,14 @@ function ProductionStats({ stage, length, cast, shootDays, budgetEmic, budgetRai
   return (
     <div className="space-y-5">
       <div>
-        <div className="text-xs font-bold uppercase tracking-widest mb-2" style={{ color: C.gold }}>Stage</div>
+        <div className="text-xs font-bold uppercase tracking-widest mb-2" style={{ color: C.gold }}>{t.stage}</div>
         <StageTrack stage={stage} />
         <div className="text-xs mt-2" style={{ color: C.sub, fontFamily: FONTS.mono }}>
           {STAGES.find((s) => s.id === stage)?.label}
         </div>
       </div>
       <div className="grid grid-cols-3 gap-3">
-        {[["Length", length || "TBC"], ["Cast", cast || "TBC"], ["Shoot", shootDays || "TBC"]].map(([label, val]) => (
+        {[[t.length, length || t.tbc], [t.cast, cast || t.tbc], [t.shoot, shootDays || t.tbc]].map(([label, val]) => (
           <div key={label} className="rounded-lg p-3" style={{ background: C.card, border: `1px solid ${C.line}` }}>
             <div className="text-xs uppercase tracking-wide" style={{ color: C.mute }}>{label}</div>
             <div className="text-sm font-semibold mt-1" style={{ color: C.ink }}>{val}</div>
@@ -1235,26 +1309,26 @@ function ProductionStats({ stage, length, cast, shootDays, budgetEmic, budgetRai
       </div>
       <div className="grid grid-cols-3 gap-3">
         <div className="rounded-lg p-3" style={{ background: C.card, border: `1px solid ${C.line}` }}>
-          <div className="text-xs uppercase tracking-wide" style={{ color: C.mute }}>EMIC base</div>
+          <div className="text-xs uppercase tracking-wide" style={{ color: C.mute }}>{t.emicBase}</div>
           <div className="text-lg font-bold" style={{ color: C.gold, fontFamily: FONTS.mono }}>€{budgetEmic}</div>
         </div>
         <div className="rounded-lg p-3" style={{ background: C.card, border: `1px solid ${C.line}` }}>
-          <div className="text-xs uppercase tracking-wide" style={{ color: C.mute }}>Raised</div>
-          <div className="text-lg font-bold" style={{ color: C.ink, fontFamily: FONTS.mono }}>{raisedValid ? `€${raisedNum}` : "TBC"}</div>
+          <div className="text-xs uppercase tracking-wide" style={{ color: C.mute }}>{t.raised}</div>
+          <div className="text-lg font-bold" style={{ color: C.ink, fontFamily: FONTS.mono }}>{raisedValid ? `€${raisedNum}` : t.tbc}</div>
         </div>
         <div className="rounded-lg p-3" style={{ background: C.card, border: `1px solid ${C.line}` }}>
-          <div className="text-xs uppercase tracking-wide" style={{ color: C.mute }}>Surplus returned</div>
-          <div className="text-lg font-bold" style={{ color: "#27AE60", fontFamily: FONTS.mono }}>{surplusValid ? `€${surplusNum}` : "TBC"}</div>
+          <div className="text-xs uppercase tracking-wide" style={{ color: C.mute }}>{t.surplusReturned}</div>
+          <div className="text-lg font-bold" style={{ color: "#27AE60", fontFamily: FONTS.mono }}>{surplusValid ? `€${surplusNum}` : t.tbc}</div>
         </div>
       </div>
       {!readOnly && (
         <button onClick={() => { setEditing(true); setSaved(false); }} className="text-xs font-semibold underline" style={{ color: C.sub }}>
-          Edit details
+          {t.editDetails}
         </button>
       )}
       {saved && (
         <span className="text-xs ml-2 inline-flex items-center gap-1" style={{ color: "#27AE60" }}>
-          <Check size={12} /> Saved
+          <Check size={12} /> {t.saved}
         </span>
       )}
     </div>
@@ -1274,6 +1348,7 @@ function blankScheduleRow() {
 }
 
 function CallsheetsEditor({ entries, onSave }) {
+  const { t } = useI18n();
   const [list, setList] = useState(entries || []);
   const [dirty, setDirty] = useState(false);
   const [saved, setSaved] = useState(false);
@@ -1303,7 +1378,7 @@ function CallsheetsEditor({ entries, onSave }) {
     <div>
       {list.length === 0 && (
         <p className="text-sm mb-4" style={{ color: C.mute, fontFamily: FONTS.body }}>
-          No call sheets yet. Add one for each day of shooting.
+          {t.noCallsheets}
         </p>
       )}
       <div className="space-y-4">
@@ -1313,57 +1388,57 @@ function CallsheetsEditor({ entries, onSave }) {
               <input
                 value={entry.day}
                 onChange={(e) => updateField(i, "day", e.target.value)}
-                placeholder={`Day ${i + 1}, e.g. Shoot day 1`}
+                placeholder={t.dayPh(i + 1)}
                 className="text-xs font-bold uppercase tracking-widest outline-none bg-transparent"
                 style={{ color: C.gold, fontFamily: FONTS.body, border: "none", width: "70%" }}
               />
-              <button onClick={() => removeEntry(i)} style={{ color: C.mute }} aria-label="Remove call sheet">
+              <button onClick={() => removeEntry(i)} style={{ color: C.mute }} aria-label={t.removeCallsheet}>
                 <Trash2 size={14} />
               </button>
             </div>
 
             <div className="grid grid-cols-2 gap-3 mb-3">
               <div>
-                <label className="text-xs" style={{ color: C.mute }}>Location</label>
+                <label className="text-xs" style={{ color: C.mute }}>{t.location}</label>
                 <input value={entry.location} onChange={(e) => updateField(i, "location", e.target.value)}
                   className="w-full mt-1 rounded-md px-3 py-2 text-sm outline-none" style={{ background: C.bg, border: `1px solid ${C.line}`, color: C.ink, fontFamily: FONTS.body }} />
               </div>
               <div>
-                <label className="text-xs" style={{ color: C.mute }}>Scenes covered</label>
+                <label className="text-xs" style={{ color: C.mute }}>{t.scenesCovered}</label>
                 <input value={entry.scenes} onChange={(e) => updateField(i, "scenes", e.target.value)}
                   className="w-full mt-1 rounded-md px-3 py-2 text-sm outline-none" style={{ background: C.bg, border: `1px solid ${C.line}`, color: C.ink, fontFamily: FONTS.body }} />
               </div>
             </div>
 
             <div className="mb-4">
-              <label className="text-xs" style={{ color: C.mute }}>Notes</label>
+              <label className="text-xs" style={{ color: C.mute }}>{t.notes}</label>
               <input value={entry.notes} onChange={(e) => updateField(i, "notes", e.target.value)}
                 className="w-full mt-1 rounded-md px-3 py-2 text-sm outline-none" style={{ background: C.bg, border: `1px solid ${C.line}`, color: C.ink, fontFamily: FONTS.body }} />
             </div>
 
-            <div className="text-xs font-bold uppercase tracking-widest mb-2" style={{ color: C.gold }}>Day schedule</div>
+            <div className="text-xs font-bold uppercase tracking-widest mb-2" style={{ color: C.gold }}>{t.daySchedule}</div>
             <div className="space-y-2 mb-2">
               {entry.schedule.map((row, ri) => (
                 <div key={ri} className="flex items-center gap-2">
                   <input value={row.time} onChange={(e) => updateRow(i, ri, "time", e.target.value)} placeholder="07:00"
                     style={{ width: 84, background: C.bg, border: `1px solid ${C.line}`, color: C.ink, fontFamily: FONTS.mono }}
                     className="rounded-md px-2 py-1.5 text-sm outline-none flex-shrink-0" />
-                  <input value={row.who} onChange={(e) => updateRow(i, ri, "who", e.target.value)} placeholder="What happens, e.g. Actors arrive, Lunch break, RTS"
+                  <input value={row.who} onChange={(e) => updateRow(i, ri, "who", e.target.value)} placeholder={t.whatHappensPh}
                     style={{ background: C.bg, border: `1px solid ${C.line}`, color: C.ink, fontFamily: FONTS.body }}
                     className="flex-1 rounded-md px-3 py-1.5 text-sm outline-none" />
-                  <button onClick={() => removeRow(i, ri)} style={{ color: C.mute }} aria-label="Remove schedule item"><Trash2 size={13} /></button>
+                  <button onClick={() => removeRow(i, ri)} style={{ color: C.mute }} aria-label={t.removeScheduleItem}><Trash2 size={13} /></button>
                 </div>
               ))}
             </div>
             <button onClick={() => addRow(i)} className="flex items-center gap-1 text-xs font-semibold" style={{ color: C.sub }}>
-              <Plus size={12} /> Add schedule item
+              <Plus size={12} /> {t.addScheduleItem}
             </button>
           </div>
         ))}
       </div>
       <div className="flex items-center gap-3 mt-4">
         <button onClick={addEntry} className="flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-bold uppercase tracking-wide" style={{ background: C.cardAlt, color: C.gold, border: `1px solid ${C.line}` }}>
-          <Plus size={13} /> Add call sheet
+          <Plus size={13} /> {t.addCallsheet}
         </button>
         <button
           disabled={!dirty}
@@ -1371,11 +1446,11 @@ function CallsheetsEditor({ entries, onSave }) {
           className="px-4 py-1.5 rounded-md text-xs font-bold uppercase tracking-wide"
           style={{ background: dirty ? C.gold : C.line, color: dirty ? "#141414" : C.mute, cursor: dirty ? "pointer" : "default" }}
         >
-          Save
+          {t.save}
         </button>
         {saved && !dirty && (
           <span className="text-xs flex items-center gap-1" style={{ color: "#27AE60" }}>
-            <Check size={13} /> Saved
+            <Check size={13} /> {t.saved}
           </span>
         )}
       </div>
@@ -1384,10 +1459,11 @@ function CallsheetsEditor({ entries, onSave }) {
 }
 
 function StaticCallsheets({ entries }) {
+  const { t } = useI18n();
   if (!entries || entries.length === 0) {
     return (
       <div className="w-full rounded-lg p-4 text-sm" style={{ background: C.card, border: `1px solid ${C.line}`, color: C.mute, fontFamily: FONTS.body }}>
-        No call sheets recorded for this example.
+        {t.noCallsheetsExample}
       </div>
     );
   }
@@ -1395,15 +1471,15 @@ function StaticCallsheets({ entries }) {
     <div className="space-y-4">
       {entries.map((entry, i) => (
         <div key={i} className="rounded-lg p-4" style={{ background: C.card, border: `1px solid ${C.line}` }}>
-          <div className="text-xs font-bold uppercase tracking-widest mb-2" style={{ color: C.gold }}>{entry.day || `Call sheet ${i + 1}`}</div>
+          <div className="text-xs font-bold uppercase tracking-widest mb-2" style={{ color: C.gold }}>{entry.day || t.callsheetN(i + 1)}</div>
           <div className="text-sm space-y-1" style={{ color: C.ink, fontFamily: FONTS.body }}>
-            {entry.location && <div><span style={{ color: C.mute }}>Location: </span>{entry.location}</div>}
-            {entry.scenes && <div><span style={{ color: C.mute }}>Scenes covered: </span>{entry.scenes}</div>}
-            {entry.notes && <div><span style={{ color: C.mute }}>Notes: </span>{entry.notes}</div>}
+            {entry.location && <div><span style={{ color: C.mute }}>{t.location}: </span>{entry.location}</div>}
+            {entry.scenes && <div><span style={{ color: C.mute }}>{t.scenesCovered}: </span>{entry.scenes}</div>}
+            {entry.notes && <div><span style={{ color: C.mute }}>{t.notes}: </span>{entry.notes}</div>}
           </div>
           {entry.schedule && entry.schedule.length > 0 && (
             <div className="mt-3">
-              <div className="text-xs font-bold uppercase tracking-wide mb-1" style={{ color: C.mute }}>Day schedule</div>
+              <div className="text-xs font-bold uppercase tracking-wide mb-1" style={{ color: C.mute }}>{t.daySchedule}</div>
               {entry.schedule.map((row, ri) => (
                 <div key={ri} className="text-sm flex gap-2" style={{ color: C.ink, fontFamily: FONTS.body }}>
                   <span style={{ fontFamily: FONTS.mono, color: C.gold, width: 50, flexShrink: 0 }}>{row.time}</span>
@@ -1426,6 +1502,7 @@ function blankCastCrewEntry() {
 }
 
 function CastCrewEditor({ entries, onSave }) {
+  const { t } = useI18n();
   const [list, setList] = useState(entries || []);
   const [dirty, setDirty] = useState(false);
   const [saved, setSaved] = useState(false);
@@ -1445,31 +1522,31 @@ function CastCrewEditor({ entries, onSave }) {
     <div>
       {list.length === 0 && (
         <p className="text-sm mb-4" style={{ color: C.mute, fontFamily: FONTS.body }}>
-          No cast or crew added yet. Add everyone involved, actors and crew together.
+          {t.noCast}
         </p>
       )}
       {list.length > 0 && (
         <div className="grid grid-cols-12 gap-2 px-1 mb-1 text-xs font-bold uppercase tracking-wide" style={{ color: C.mute }}>
-          <div className="col-span-3">Name</div>
-          <div className="col-span-3">Role</div>
-          <div className="col-span-2">Phone</div>
-          <div className="col-span-3">Email</div>
+          <div className="col-span-3">{t.name}</div>
+          <div className="col-span-3">{t.role}</div>
+          <div className="col-span-2">{t.phone}</div>
+          <div className="col-span-3">{t.email}</div>
         </div>
       )}
       <div className="space-y-2">
         {list.map((p, i) => (
           <div key={i} className="grid grid-cols-12 gap-2 items-center rounded-lg p-2" style={{ background: C.card, border: `1px solid ${C.line}` }}>
-            <input value={p.name} onChange={(e) => update(i, "name", e.target.value)} placeholder="Name" className="col-span-3 rounded-md px-2 py-1.5 text-sm outline-none" style={inputStyle} />
-            <input value={p.role} onChange={(e) => update(i, "role", e.target.value)} placeholder="e.g. Director, Actor" className="col-span-3 rounded-md px-2 py-1.5 text-sm outline-none" style={inputStyle} />
-            <input value={p.phone} onChange={(e) => update(i, "phone", e.target.value)} placeholder="Phone" className="col-span-2 rounded-md px-2 py-1.5 text-sm outline-none" style={inputStyle} />
-            <input value={p.email} onChange={(e) => update(i, "email", e.target.value)} placeholder="Email" className="col-span-3 rounded-md px-2 py-1.5 text-sm outline-none" style={inputStyle} />
-            <button onClick={() => removeEntry(i)} style={{ color: C.mute }} className="col-span-1 flex justify-center" aria-label="Remove person"><Trash2 size={14} /></button>
+            <input value={p.name} onChange={(e) => update(i, "name", e.target.value)} placeholder={t.name} className="col-span-3 rounded-md px-2 py-1.5 text-sm outline-none" style={inputStyle} />
+            <input value={p.role} onChange={(e) => update(i, "role", e.target.value)} placeholder={t.rolePh} className="col-span-3 rounded-md px-2 py-1.5 text-sm outline-none" style={inputStyle} />
+            <input value={p.phone} onChange={(e) => update(i, "phone", e.target.value)} placeholder={t.phone} className="col-span-2 rounded-md px-2 py-1.5 text-sm outline-none" style={inputStyle} />
+            <input value={p.email} onChange={(e) => update(i, "email", e.target.value)} placeholder={t.email} className="col-span-3 rounded-md px-2 py-1.5 text-sm outline-none" style={inputStyle} />
+            <button onClick={() => removeEntry(i)} style={{ color: C.mute }} className="col-span-1 flex justify-center" aria-label={t.removePerson}><Trash2 size={14} /></button>
           </div>
         ))}
       </div>
       <div className="flex items-center gap-3 mt-4">
         <button onClick={addEntry} className="flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-bold uppercase tracking-wide" style={{ background: C.cardAlt, color: C.gold, border: `1px solid ${C.line}` }}>
-          <Plus size={13} /> Add person
+          <Plus size={13} /> {t.addPerson}
         </button>
         <button
           disabled={!dirty}
@@ -1477,11 +1554,11 @@ function CastCrewEditor({ entries, onSave }) {
           className="px-4 py-1.5 rounded-md text-xs font-bold uppercase tracking-wide"
           style={{ background: dirty ? C.gold : C.line, color: dirty ? "#141414" : C.mute, cursor: dirty ? "pointer" : "default" }}
         >
-          Save
+          {t.save}
         </button>
         {saved && !dirty && (
           <span className="text-xs flex items-center gap-1" style={{ color: "#27AE60" }}>
-            <Check size={13} /> Saved
+            <Check size={13} /> {t.saved}
           </span>
         )}
       </div>
@@ -1490,10 +1567,11 @@ function CastCrewEditor({ entries, onSave }) {
 }
 
 function StaticCastCrew({ entries }) {
+  const { t } = useI18n();
   if (!entries || entries.length === 0) {
     return (
       <div className="w-full rounded-lg p-4 text-sm" style={{ background: C.card, border: `1px solid ${C.line}`, color: C.mute, fontFamily: FONTS.body }}>
-        No cast or crew recorded for this example.
+        {t.noCastExample}
       </div>
     );
   }
@@ -1501,7 +1579,7 @@ function StaticCastCrew({ entries }) {
     <div className="space-y-2">
       {entries.map((p, i) => (
         <div key={i} className="flex items-center gap-3 rounded-lg p-3 text-sm" style={{ background: C.card, border: `1px solid ${C.line}`, color: C.ink, fontFamily: FONTS.body }}>
-          <span style={{ fontWeight: 700, minWidth: 100 }}>{p.name || "Unnamed"}</span>
+          <span style={{ fontWeight: 700, minWidth: 100 }}>{p.name || t.unnamed}</span>
           <span style={{ color: C.sub }}>{p.role}</span>
           {p.phone && <span style={{ color: C.mute }}>· {p.phone}</span>}
           {p.email && <span style={{ color: C.mute }}>· {p.email}</span>}
@@ -1515,6 +1593,7 @@ function StaticCastCrew({ entries }) {
 /*  EQUIPMENT & PROPS, two simple checklists shared across the shoot.      */
 /* ---------------------------------------------------------------------- */
 function ChecklistRows({ items, setItems, placeholder }) {
+  const { t } = useI18n();
   return (
     <div className="space-y-2">
       {items.map((item, i) => (
@@ -1526,17 +1605,18 @@ function ChecklistRows({ items, setItems, placeholder }) {
             className="flex-1 rounded-md px-3 py-2 text-sm outline-none"
             style={{ background: C.bg, border: `1px solid ${C.line}`, color: C.ink, fontFamily: FONTS.body }}
           />
-          <button onClick={() => setItems(items.filter((_, idx) => idx !== i))} style={{ color: C.mute }} aria-label="Remove item"><Trash2 size={14} /></button>
+          <button onClick={() => setItems(items.filter((_, idx) => idx !== i))} style={{ color: C.mute }} aria-label={t.removeItem}><Trash2 size={14} /></button>
         </div>
       ))}
       <button onClick={() => setItems([...items, ""])} className="flex items-center gap-1 text-xs font-semibold" style={{ color: C.sub }}>
-        <Plus size={12} /> Add item
+        <Plus size={12} /> {t.addItem}
       </button>
     </div>
   );
 }
 
 function EquipmentPropsEditor({ equipment, props, onSave }) {
+  const { t } = useI18n();
   const [eq, setEq] = useState(equipment || []);
   const [pr, setPr] = useState(props || []);
   const [dirty, setDirty] = useState(false);
@@ -1550,14 +1630,14 @@ function EquipmentPropsEditor({ equipment, props, onSave }) {
   return (
     <div>
       <div className="mb-6">
-        <div className="text-xs font-bold uppercase tracking-widest mb-2" style={{ color: C.gold }}>Technical equipment</div>
-        {eq.length === 0 && <p className="text-sm mb-2" style={{ color: C.mute, fontFamily: FONTS.body }}>Nothing listed yet.</p>}
-        <ChecklistRows items={eq} setItems={wrapEq} placeholder="e.g. iPhone 15 Pro, DJI Mic 2, gimbal" />
+        <div className="text-xs font-bold uppercase tracking-widest mb-2" style={{ color: C.gold }}>{t.techEquipment}</div>
+        {eq.length === 0 && <p className="text-sm mb-2" style={{ color: C.mute, fontFamily: FONTS.body }}>{t.nothingListed}</p>}
+        <ChecklistRows items={eq} setItems={wrapEq} placeholder={t.equipPh} />
       </div>
       <div className="mb-4">
-        <div className="text-xs font-bold uppercase tracking-widest mb-2" style={{ color: C.gold }}>Props & accessories</div>
-        {pr.length === 0 && <p className="text-sm mb-2" style={{ color: C.mute, fontFamily: FONTS.body }}>Nothing listed yet.</p>}
-        <ChecklistRows items={pr} setItems={wrapPr} placeholder="e.g. prop phone, tote bag, costume piece" />
+        <div className="text-xs font-bold uppercase tracking-widest mb-2" style={{ color: C.gold }}>{t.propsAccessories}</div>
+        {pr.length === 0 && <p className="text-sm mb-2" style={{ color: C.mute, fontFamily: FONTS.body }}>{t.nothingListed}</p>}
+        <ChecklistRows items={pr} setItems={wrapPr} placeholder={t.propsPh} />
       </div>
       <div className="flex items-center gap-3">
         <button
@@ -1566,11 +1646,11 @@ function EquipmentPropsEditor({ equipment, props, onSave }) {
           className="px-4 py-1.5 rounded-md text-xs font-bold uppercase tracking-wide"
           style={{ background: dirty ? C.gold : C.line, color: dirty ? "#141414" : C.mute, cursor: dirty ? "pointer" : "default" }}
         >
-          Save
+          {t.save}
         </button>
         {saved && !dirty && (
           <span className="text-xs flex items-center gap-1" style={{ color: "#27AE60" }}>
-            <Check size={13} /> Saved
+            <Check size={13} /> {t.saved}
           </span>
         )}
       </div>
@@ -1579,9 +1659,10 @@ function EquipmentPropsEditor({ equipment, props, onSave }) {
 }
 
 function StaticEquipmentProps({ equipment, props }) {
+  const { t } = useI18n();
   const List = ({ items }) =>
     !items || items.length === 0 ? (
-      <p className="text-sm" style={{ color: C.mute, fontFamily: FONTS.body }}>None recorded.</p>
+      <p className="text-sm" style={{ color: C.mute, fontFamily: FONTS.body }}>{t.noneRecorded}</p>
     ) : (
       <ul className="text-sm space-y-1" style={{ color: C.ink, fontFamily: FONTS.body }}>
         {items.map((item, i) => <li key={i}>· {item}</li>)}
@@ -1590,11 +1671,11 @@ function StaticEquipmentProps({ equipment, props }) {
   return (
     <div>
       <div className="mb-5">
-        <div className="text-xs font-bold uppercase tracking-widest mb-2" style={{ color: C.gold }}>Technical equipment</div>
+        <div className="text-xs font-bold uppercase tracking-widest mb-2" style={{ color: C.gold }}>{t.techEquipment}</div>
         <List items={equipment} />
       </div>
       <div>
-        <div className="text-xs font-bold uppercase tracking-widest mb-2" style={{ color: C.gold }}>Props & accessories</div>
+        <div className="text-xs font-bold uppercase tracking-widest mb-2" style={{ color: C.gold }}>{t.propsAccessories}</div>
         <List items={props} />
       </div>
     </div>
@@ -1606,6 +1687,7 @@ function StaticEquipmentProps({ equipment, props }) {
 /*  PRINT VIEW, a clean white-background document for Print / Save as PDF  */
 /* ---------------------------------------------------------------------- */
 function PrintView({ production, theme, readOnly, onClose }) {
+  const { t, STAGES } = useI18n();
   const title = readOnly ? production.filmTitle : production.sections.filmTitle;
   const tagline = readOnly ? production.tagline : production.sections.tagline;
   const stage = readOnly ? production.stage : production.sections.stage;
@@ -1630,7 +1712,7 @@ function PrintView({ production, theme, readOnly, onClose }) {
 
   const Prose = ({ text, empty }) => (
     <div style={{ fontSize: 13, lineHeight: 1.6, whiteSpace: "pre-wrap", color: "#222" }}>
-      {text && text.trim() ? text : <span style={{ color: "#999" }}>{empty || "Not yet completed."}</span>}
+      {text && text.trim() ? text : <span style={{ color: "#999" }}>{empty || t.notCompleted}</span>}
     </div>
   );
 
@@ -1648,45 +1730,45 @@ function PrintView({ production, theme, readOnly, onClose }) {
 
       <div className="no-print" style={{ position: "sticky", top: 0, background: "#f4f4f4", borderBottom: "1px solid #ddd", padding: "12px 24px", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
         <button onClick={onClose} style={{ fontSize: 13, color: "#333", background: "none", border: "none", cursor: "pointer", fontWeight: 600 }}>
-          Back
+          {t.back}
         </button>
         <button
           onClick={() => window.print()}
           style={{ display: "flex", alignItems: "center", gap: 6, padding: "8px 16px", borderRadius: 6, background: "#141414", color: "#fff", border: "none", fontWeight: 700, fontSize: 13, cursor: "pointer" }}
         >
-          Print / Save as PDF
+          {t.printPdf}
         </button>
       </div>
 
       <div style={{ maxWidth: 720, margin: "0 auto", padding: "40px 32px 80px", fontFamily: "Arial, Helvetica, sans-serif" }}>
         <div style={{ borderBottom: `3px solid ${theme.color}`, paddingBottom: 16, marginBottom: 24 }}>
           <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: 2, textTransform: "uppercase", color: theme.color }}>{theme.name}</div>
-          <div style={{ fontSize: 28, fontWeight: 800, color: "#111", marginTop: 4 }}>{title || "Untitled production"}</div>
+          <div style={{ fontSize: 28, fontWeight: 800, color: "#111", marginTop: 4 }}>{title || t.untitled}</div>
           {tagline && <div style={{ fontSize: 14, color: "#555", marginTop: 2 }}>{tagline}</div>}
           <div style={{ fontSize: 10, color: "#999", marginTop: 10, letterSpacing: 0.5 }}>
-            EMIC LAB SHORTS, EMIC LABS DATABASE V12, Master II Audiovisuel, Season 2026 / 2027
+            {t.printFooter}
           </div>
         </div>
 
-        <Section label="Production details">
+        <Section label={t.productionDetails}>
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 10, fontSize: 13, color: "#222" }}>
-            <div><b>Stage:</b> {STAGES.find((s) => s.id === stage)?.label}</div>
-            <div><b>Length:</b> {length || "TBC"}</div>
-            <div><b>Cast:</b> {cast || "TBC"}</div>
-            <div><b>EMIC base:</b> €{production.budgetEmic}</div>
-            <div><b>Raised:</b> {raisedValid ? `€${raisedNum}` : "TBC"}</div>
-            <div><b>Surplus returned:</b> {surplusValid ? `€${surplusNum}` : "TBC"}</div>
+            <div><b>{t.stage}:</b> {STAGES.find((s) => s.id === stage)?.label}</div>
+            <div><b>{t.length}:</b> {length || t.tbc}</div>
+            <div><b>{t.cast}:</b> {cast || t.tbc}</div>
+            <div><b>{t.emicBase}:</b> €{production.budgetEmic}</div>
+            <div><b>{t.raised}:</b> {raisedValid ? `€${raisedNum}` : t.tbc}</div>
+            <div><b>{t.surplusReturned}:</b> {surplusValid ? `€${surplusNum}` : t.tbc}</div>
           </div>
           <div style={{ fontSize: 13, color: "#222", marginTop: 10 }}>
-            <b>Group:</b> {memberNames.length ? memberNames.join(", ") : (readOnly ? "Not recorded for this example" : "Not yet allocated")}
+            <b>{t.group}:</b> {memberNames.length ? memberNames.join(", ") : (readOnly ? t.notRecordedExample : t.notAllocated)}
           </div>
         </Section>
 
-        <Section label="Pitch & outline"><Prose text={production.sections.pitch} /></Section>
-        <Section label="Script"><Prose text={production.sections.script} empty="No script submitted." /></Section>
-        <Section label="Budget">
+        <Section label={t.pitchOutline}><Prose text={production.sections.pitch} /></Section>
+        <Section label={t.script}><Prose text={production.sections.script} empty={t.noScript} /></Section>
+        <Section label={t.budget}>
           {(!production.sections.budget || production.sections.budget.length === 0) ? (
-            <Prose text="" empty="No budget lines recorded." />
+            <Prose text="" empty={t.noBudget} />
           ) : (
             <>
               {production.sections.budget.map((r, i) => (
@@ -1696,15 +1778,15 @@ function PrintView({ production, theme, readOnly, onClose }) {
                 </div>
               ))}
               <div style={{ display: "flex", justifyContent: "space-between", fontSize: 13, fontWeight: 700, color: "#111", marginTop: 6, paddingTop: 6, borderTop: "1px solid #ddd" }}>
-                <span>Total</span>
+                <span>{t.total}</span>
                 <span>{formatEuro(sumBudget(production.sections.budget))}</span>
               </div>
             </>
           )}
         </Section>
-        <Section label="Shooting schedule">
+        <Section label={t.shootingSchedule}>
           {(!production.sections.schedule || production.sections.schedule.length === 0) ? (
-            <Prose text="" empty="No schedule recorded." />
+            <Prose text="" empty={t.noSchedule} />
           ) : (
             STAGES.map((s) => {
               const row = (production.sections.schedule || []).find((r) => r.stageId === s.id);
@@ -1712,61 +1794,61 @@ function PrintView({ production, theme, readOnly, onClose }) {
               return (
                 <div key={s.id} style={{ fontSize: 13, color: "#222", marginBottom: 3 }}>
                   <b>{row.done ? "✓" : "○"} {s.label}</b>
-                  {row.date && <span style={{ color: "#666" }}> (actual: {row.date})</span>}
+                  {row.date && <span style={{ color: "#666" }}> {t.actual(row.date)}</span>}
                   {row.note && <span> · {row.note}</span>}
                 </div>
               );
             })
           )}
         </Section>
-        <Section label="Shot list">
+        <Section label={t.shotList}>
           {(!production.sections.shotlist || production.sections.shotlist.length === 0) ? (
-            <Prose text="" empty="No shots recorded." />
+            <Prose text="" empty={t.noShotsRec} />
           ) : (
             production.sections.shotlist.map((r, i) => (
               <div key={i} style={{ fontSize: 13, color: "#222", marginBottom: 6 }}>
                 <b>{r.number}</b> {r.location}{r.duration ? `, ${r.duration}` : ""}{r.framing ? `, ${r.framing}` : ""}
                 <div>{r.description}</div>
-                {r.characters && <div style={{ color: "#666" }}>Characters: {r.characters}</div>}
+                {r.characters && <div style={{ color: "#666" }}>{t.characters}: {r.characters}</div>}
               </div>
             ))
           )}
         </Section>
 
-        <Section label="Cast & crew">
+        <Section label={t.castCrew}>
           {(!production.sections.castCrew || production.sections.castCrew.length === 0) ? (
-            <Prose text="" empty="No cast or crew recorded." />
+            <Prose text="" empty={t.noCastRec} />
           ) : (
             production.sections.castCrew.map((p, i) => (
               <div key={i} style={{ fontSize: 13, color: "#222", marginBottom: 4 }}>
-                <b>{p.name || "Unnamed"}</b>{p.role ? `, ${p.role}` : ""}{p.phone ? ` · ${p.phone}` : ""}{p.email ? ` · ${p.email}` : ""}
+                <b>{p.name || t.unnamed}</b>{p.role ? `, ${p.role}` : ""}{p.phone ? ` · ${p.phone}` : ""}{p.email ? ` · ${p.email}` : ""}
               </div>
             ))
           )}
         </Section>
 
-        <Section label="Equipment & props">
+        <Section label={t.equipProps}>
           <div style={{ fontSize: 13, color: "#222" }}>
-            <b>Technical equipment:</b> {production.sections.equipment && production.sections.equipment.length ? production.sections.equipment.join(", ") : "None recorded."}
+            <b>{t.techEquipment}:</b> {production.sections.equipment && production.sections.equipment.length ? production.sections.equipment.join(", ") : t.noneRecorded}
           </div>
           <div style={{ fontSize: 13, color: "#222", marginTop: 4 }}>
-            <b>Props & accessories:</b> {production.sections.props && production.sections.props.length ? production.sections.props.join(", ") : "None recorded."}
+            <b>{t.propsAccessories}:</b> {production.sections.props && production.sections.props.length ? production.sections.props.join(", ") : t.noneRecorded}
           </div>
         </Section>
 
-        <Section label="Call sheets">
+        <Section label={t.callSheets}>
           {callsheets.length === 0 ? (
-            <Prose text="" empty="No call sheets recorded." />
+            <Prose text="" empty={t.noCallsheetsRec} />
           ) : (
             callsheets.map((e, i) => (
               <div key={i} style={{ marginBottom: 14, fontSize: 13, color: "#222" }}>
-                <div style={{ fontWeight: 700, marginBottom: 4 }}>{e.day || `Call sheet ${i + 1}`}</div>
-                {e.location && <div><b>Location:</b> {e.location}</div>}
-                {e.scenes && <div><b>Scenes covered:</b> {e.scenes}</div>}
-                {e.notes && <div><b>Notes:</b> {e.notes}</div>}
+                <div style={{ fontWeight: 700, marginBottom: 4 }}>{e.day || t.callsheetN(i + 1)}</div>
+                {e.location && <div><b>{t.location}:</b> {e.location}</div>}
+                {e.scenes && <div><b>{t.scenesCovered}:</b> {e.scenes}</div>}
+                {e.notes && <div><b>{t.notes}:</b> {e.notes}</div>}
                 {e.schedule && e.schedule.length > 0 && (
                   <div style={{ marginTop: 4 }}>
-                    <b>Day schedule:</b>
+                    <b>{t.daySchedule}:</b>
                     {e.schedule.map((row, ri) => <div key={ri} style={{ marginLeft: 12 }}>{row.time}: {row.who}</div>)}
                   </div>
                 )}
@@ -1775,7 +1857,7 @@ function PrintView({ production, theme, readOnly, onClose }) {
           )}
         </Section>
 
-        <Section label="Jury prep"><Prose text={production.sections.jury} /></Section>
+        <Section label={t.juryPrep}><Prose text={production.sections.jury} /></Section>
       </div>
     </div>
   );
@@ -1785,6 +1867,7 @@ function PrintView({ production, theme, readOnly, onClose }) {
 /*  PRODUCTION DETAIL, shared by live theme slots and read-only examples   */
 /* ---------------------------------------------------------------------- */
 function ProductionDetail({ production, readOnly, onUpdate, onClose }) {
+  const { t, THEMES, TABS } = useI18n();
   const [tab, setTab] = useState("overview");
   const [printMode, setPrintMode] = useState(false);
   const theme = THEMES.find((t) => t.id === production.themeId);
@@ -1827,15 +1910,16 @@ function ProductionDetail({ production, readOnly, onUpdate, onClose }) {
             />
           </div>
           <div className="flex items-center gap-3">
+            <LangToggle />
             <button
               onClick={() => setPrintMode(true)}
               className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wide"
               style={{ color: C.sub }}
-              title="Export this production as a PDF"
+              title={t.exportPdfTitle}
             >
-              <Printer size={15} /> Export PDF
+              <Printer size={15} /> {t.exportPdf}
             </button>
-            <button onClick={onClose} style={{ color: C.mute }} aria-label="Close">
+            <button onClick={onClose} style={{ color: C.mute }} aria-label={t.close}>
               <X size={22} />
             </button>
           </div>
@@ -1888,10 +1972,10 @@ function ProductionDetail({ production, readOnly, onUpdate, onClose }) {
 
           {tab === "pitch" && (readOnly
             ? <StaticSection value={production.sections.pitch} />
-            : <EditableSection value={production.sections.pitch} placeholder="Write the logline, statement of intent, and dramatic structure here." onSave={(v) => persist({ pitch: v })} />)}
+            : <EditableSection value={production.sections.pitch} placeholder={t.pitchPh} onSave={(v) => persist({ pitch: v })} />)}
           {tab === "script" && (readOnly
-            ? <StaticSection value={production.sections.script} emptyText="No script submitted for this example." />
-            : <EditableSection value={production.sections.script} placeholder="Paste or write the full script here, scene headings, action, and dialogue." onSave={(v) => persist({ script: v })} />)}
+            ? <StaticSection value={production.sections.script} emptyText={t.noScriptExample} />
+            : <EditableSection value={production.sections.script} placeholder={t.scriptPh} onSave={(v) => persist({ script: v })} />)}
           {tab === "castcrew" && (readOnly
             ? <StaticCastCrew entries={production.sections.castCrew} />
             : <CastCrewEditor entries={production.sections.castCrew} onSave={(v) => persist({ castCrew: v })} />)}
@@ -1912,7 +1996,7 @@ function ProductionDetail({ production, readOnly, onUpdate, onClose }) {
             : <CallsheetsEditor entries={production.sections.callsheets} onSave={(v) => persist({ callsheets: v })} />)}
           {tab === "jury" && (readOnly
             ? <StaticSection value={production.sections.jury} />
-            : <EditableSection value={production.sections.jury} placeholder="Anticipate the jury's questions and draft your answers." onSave={(v) => persist({ jury: v })} />)}
+            : <EditableSection value={production.sections.jury} placeholder={t.juryPh} onSave={(v) => persist({ jury: v })} />)}
         </div>
       </div>
     </div>
@@ -1929,6 +2013,7 @@ function isFilled(key, v) {
 }
 
 function ProductionCard({ production, onOpen }) {
+  const { t, THEMES, STAGES } = useI18n();
   const theme = THEMES.find((t) => t.id === production.themeId);
   const totalFields = Object.keys(production.sections).filter((k) => k !== "stage").length;
   const filled = Object.entries(production.sections).filter(([k, v]) => k !== "stage" && isFilled(k, v)).length;
@@ -1959,19 +2044,19 @@ function ProductionCard({ production, onOpen }) {
               {tagline && <div className="text-sm mt-1" style={{ color: C.sub, fontFamily: FONTS.body }}>{tagline}</div>}
             </>
           ) : (
-            <div className="text-sm" style={{ color: C.mute, fontFamily: FONTS.body }}>No title yet. Click to start.</div>
+            <div className="text-sm" style={{ color: C.mute, fontFamily: FONTS.body }}>{t.noTitleClick}</div>
           )}
         </div>
 
         <div className="flex items-center gap-1.5 mb-4 text-sm" style={{ color: memberNames.length ? C.sub : C.mute, fontFamily: FONTS.body }}>
           <Users size={14} />
-          <span className="line-clamp-1">{memberNames.length > 0 ? memberNames.join(", ") : "Not yet allocated"}</span>
+          <span className="line-clamp-1">{memberNames.length > 0 ? memberNames.join(", ") : t.notAllocated}</span>
         </div>
 
         <StageTrack stage={production.sections.stage} compact />
         <div className="flex items-center justify-between mt-3 text-xs" style={{ color: C.mute, fontFamily: FONTS.mono }}>
           <span className="flex items-center gap-1"><Clock size={12} /> {STAGES.find((s) => s.id === production.sections.stage)?.label}</span>
-          <span>{filled}/{totalFields} filled</span>
+          <span>{t.filled(filled, totalFields)}</span>
         </div>
       </div>
     </button>
@@ -1979,6 +2064,7 @@ function ProductionCard({ production, onOpen }) {
 }
 
 function ExampleCard({ production, onOpen }) {
+  const { THEMES } = useI18n();
   const theme = THEMES.find((t) => t.id === production.themeId);
   return (
     <button
@@ -2003,6 +2089,7 @@ function ExampleCard({ production, onOpen }) {
 /*  PROJECT BRIEF (STATIC REFERENCE) VIEW                                  */
 /* ---------------------------------------------------------------------- */
 function BriefView({ onOpenExample }) {
+  const { t, STAGES, DOSSIER_SECTIONS, EXAMPLE_PRODUCTIONS } = useI18n();
   const [section, setSection] = useState("brief");
   const active = DOSSIER_SECTIONS.find((s) => s.key === section);
 
@@ -2030,7 +2117,7 @@ function BriefView({ onOpenExample }) {
         {active.key === "calendar" ? (
           <div>
             <p className="text-sm mb-4" style={{ color: C.sub, fontFamily: FONTS.body }}>
-              The real EMIC session calendar for this project. Every production's Stage, set on its Overview tab, is one of these checkpoints.
+              {t.calendarIntro}
             </p>
             <div className="space-y-2">
               {STAGES.map((s) => (
@@ -2048,7 +2135,7 @@ function BriefView({ onOpenExample }) {
         ) : active.key === "examples" ? (
           <div>
             <p className="text-sm mb-4" style={{ color: C.sub, fontFamily: FONTS.body }}>
-              Two worked examples from a previous season, kept here for reference. Click either to see the full production dossier: pitch, budget, shot list, callsheets, and jury prep.
+              {t.examplesIntro}
             </p>
             <div className="grid grid-cols-2 gap-4">
               {EXAMPLE_PRODUCTIONS.map((ex) => (
@@ -2076,17 +2163,18 @@ function BriefView({ onOpenExample }) {
 /*  is visible at a glance.                                                 */
 /* ---------------------------------------------------------------------- */
 function ScheduleView({ productions }) {
+  const { t, THEMES, STAGES } = useI18n();
   return (
     <div>
       <p className="text-sm mb-4" style={{ color: C.sub, fontFamily: FONTS.body }}>
-        Every group's current stage against the real EMIC calendar, in one view.
+        {t.scheduleIntro}
       </p>
       <div className="rounded-xl overflow-hidden" style={{ border: `1px solid ${C.line}` }}>
         <div className="grid grid-cols-12 px-4 py-3 text-xs font-bold uppercase tracking-wide" style={{ background: C.cardAlt, color: C.mute }}>
-          <div className="col-span-2">Theme</div>
-          <div className="col-span-3">Title</div>
-          <div className="col-span-2">Group</div>
-          <div className="col-span-5">Stage</div>
+          <div className="col-span-2">{t.theme}</div>
+          <div className="col-span-3">{t.title}</div>
+          <div className="col-span-2">{t.group}</div>
+          <div className="col-span-5">{t.stage}</div>
         </div>
         {productions.map((p, i) => {
           const theme = THEMES.find((t) => t.id === p.themeId);
@@ -2103,10 +2191,10 @@ function ScheduleView({ productions }) {
                 <span style={{ color: C.ink, fontFamily: FONTS.body, fontWeight: 600 }}>{theme.name}</span>
               </div>
               <div className="col-span-3" style={{ color: p.sections.filmTitle ? C.ink : C.mute, fontFamily: FONTS.body }}>
-                {p.sections.filmTitle || "No title yet"}
+                {p.sections.filmTitle || t.noTitle}
               </div>
               <div className="col-span-2" style={{ color: names.length ? C.sub : C.mute, fontFamily: FONTS.body }}>
-                {names.length ? names.join(", ") : "Not yet allocated"}
+                {names.length ? names.join(", ") : t.notAllocated}
               </div>
               <div className="col-span-5">
                 <StageTrack stage={p.sections.stage} compact />
@@ -2126,6 +2214,7 @@ function ScheduleView({ productions }) {
 /*  CONTACTS VIEW                                                           */
 /* ---------------------------------------------------------------------- */
 function ContactsView() {
+  const { CONTACTS } = useI18n();
   return (
     <div className="grid grid-cols-3 gap-4">
       {CONTACTS.map((c) => (
@@ -2155,6 +2244,7 @@ function ContactsView() {
 /*  in Supabase.                                                            */
 /* ---------------------------------------------------------------------- */
 function NotesView() {
+  const { t } = useI18n();
   const [pin, setPin] = useState(() => {
     try { return sessionStorage.getItem("emic-notes-pin"); } catch { return null; }
   });
@@ -2202,7 +2292,7 @@ function NotesView() {
         <div className="flex items-start gap-2 mb-3">
           <Lock size={16} style={{ color: C.gold, flexShrink: 0, marginTop: 2 }} />
           <p className="text-xs" style={{ color: C.sub, fontFamily: FONTS.body }}>
-            Staff only. This section has its own separate code, not the general edit code.
+            {t.staffOnly}
           </p>
         </div>
         <div className="flex gap-2">
@@ -2212,7 +2302,7 @@ function NotesView() {
             value={value}
             onChange={(e) => { setValue(e.target.value); setErr(false); }}
             onKeyDown={(e) => { if (e.key === "Enter") attempt(); }}
-            placeholder="Notes code"
+            placeholder={t.notesCodePh}
             className="flex-1 rounded-md px-3 py-2 text-sm outline-none"
             style={{ background: C.card, border: `1px solid ${err ? "#E74C3C" : C.line}`, color: C.ink, fontFamily: FONTS.body }}
           />
@@ -2222,12 +2312,12 @@ function NotesView() {
             className="px-4 py-2 rounded-md text-xs font-bold uppercase tracking-wide"
             style={{ background: C.gold, color: "#141414", opacity: checking ? 0.6 : 1 }}
           >
-            {checking ? "Checking…" : "Unlock"}
+            {checking ? t.checking : t.unlock}
           </button>
         </div>
         {err && (
           <div className="text-xs mt-2" style={{ color: "#E74C3C", fontFamily: FONTS.body }}>
-            Incorrect code.
+            {t.incorrectCode}
           </div>
         )}
       </div>
@@ -2239,15 +2329,15 @@ function NotesView() {
       <div className="flex items-start gap-2 mb-4 rounded-lg p-3" style={{ background: C.cardAlt, border: `1px solid ${C.line}` }}>
         <Lock size={16} style={{ color: C.gold, flexShrink: 0, marginTop: 2 }} />
         <p className="text-xs" style={{ color: C.sub, fontFamily: FONTS.body }}>
-          Meant for Matt and team only. Only visible to whoever knows this section's code.
+          {t.notesVisible}
         </p>
       </div>
       {!loaded ? (
-        <div className="text-sm" style={{ color: C.mute }}>Loading.</div>
+        <div className="text-sm" style={{ color: C.mute }}>{t.loading}</div>
       ) : (
         <EditableSection
           value={notes}
-          placeholder="Internal notes: group concerns, budget flags, jury scheduling, anything not meant for students."
+          placeholder={t.notesPh}
           onSave={async (v) => {
             setNotes(v);
             await saveSchoolNotes(pin, v);
@@ -2263,6 +2353,17 @@ function NotesView() {
 /* ---------------------------------------------------------------------- */
 export default function EmicProductionDatabase() {
   useCinemaFonts();
+
+  const [lang, setLang] = useState(readSavedLang);
+  const locale = useMemo(() => ({
+    ...buildLocale(lang),
+    setLang: (next) => {
+      setLang(next);
+      try { localStorage.setItem("emic-lang", next); } catch {}
+    },
+  }), [lang]);
+  const { t } = locale;
+  useEffect(() => { document.documentElement.lang = lang; }, [lang]);
 
   const [view, setView] = useState("productions");
   const [productions, setProductions] = useState(DEFAULT_PRODUCTIONS);
@@ -2305,29 +2406,30 @@ export default function EmicProductionDatabase() {
     if (!search) return productions;
     const q = search.toLowerCase();
     return productions.filter((p) => {
-      const theme = THEMES.find((t) => t.id === p.themeId);
+      const theme = locale.THEMES.find((th) => th.id === p.themeId);
       const haystack = `${theme?.name || ""} ${p.sections.filmTitle || ""} ${p.sections.tagline || ""} ${p.sections.members || ""}`.toLowerCase();
       return haystack.includes(q);
     });
-  }, [productions, search]);
+  }, [productions, search, locale]);
 
   const openProd = productions.find((p) => p.id === openId);
-  const openExample = EXAMPLE_PRODUCTIONS.find((e) => e.id === openExampleId);
+  const openExample = locale.EXAMPLE_PRODUCTIONS.find((e) => e.id === openExampleId);
 
   const NAV = [
-    { key: "brief", label: "Project Brief", icon: BookOpen },
-    { key: "productions", label: "Productions", icon: FolderOpen },
-    { key: "schedule", label: "Schedule", icon: ListChecks },
-    { key: "contacts", label: "Contacts", icon: Phone },
-    { key: "notes", label: "School Notes", icon: StickyNote },
+    { key: "brief", label: t.navBrief, icon: BookOpen },
+    { key: "productions", label: t.navProductions, icon: FolderOpen },
+    { key: "schedule", label: t.navSchedule, icon: ListChecks },
+    { key: "contacts", label: t.navContacts, icon: Phone },
+    { key: "notes", label: t.navNotes, icon: StickyNote },
   ];
 
   return (
+    <LangContext.Provider value={locale}>
     <div className="min-h-screen w-full" style={{ background: `radial-gradient(ellipse 80% 60% at 50% 0%, #171512 0%, ${C.bg} 60%)`, fontFamily: FONTS.body }}>
       <header className="flex flex-col items-center py-12 px-4" style={{ background: "#1F1F1F" }}>
         <img src={`data:image/png;base64,${LOGO_B64}`} alt="EMIC LAB SHORTS" style={{ height: 120, width: "auto", borderRadius: 8 }} />
         <div className="text-xs uppercase mt-5" style={{ color: C.sub, letterSpacing: 4, fontFamily: FONTS.body }}>
-          Master II Audiovisuel · Season 2026 / 2027
+          {t.season}
         </div>
         <div className="text-base uppercase font-bold mt-1.5" style={{ color: C.gold, letterSpacing: 3, fontFamily: FONTS.body }}>
           EMIC LABS DATABASE V12
@@ -2351,14 +2453,15 @@ export default function EmicProductionDatabase() {
             <input
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              placeholder="Search by theme, title, or student name."
+              placeholder={t.searchPh}
               className="bg-transparent outline-none text-sm w-64"
               style={{ color: C.ink, fontFamily: FONTS.body }}
             />
           </div>
         )}
 
-        <div className="ml-auto">
+        <div className="ml-auto flex items-center gap-2">
+          <LangToggle />
           <EditGate unlocked={unlocked} onUnlock={handleUnlock} onLock={handleLock} />
         </div>
       </div>
@@ -2368,10 +2471,10 @@ export default function EmicProductionDatabase() {
 
         {view === "productions" && (
           <>
-            {!loaded && <div className="text-sm mb-4" style={{ color: C.mute }}>Loading saved edits.</div>}
+            {!loaded && <div className="text-sm mb-4" style={{ color: C.mute }}>{t.loadingEdits}</div>}
             {filtered.length === 0 && (
               <div className="text-sm py-8 text-center" style={{ color: C.mute }}>
-                No productions match "{search}".
+                {t.noMatch(search)}
               </div>
             )}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -2388,7 +2491,7 @@ export default function EmicProductionDatabase() {
       </main>
 
       <footer className="text-center text-xs py-6" style={{ color: C.mute, fontFamily: FONTS.body }}>
-        Shared live database. Edits save for everyone as you go.
+        {t.footer}
       </footer>
 
       {openProd && (
@@ -2409,5 +2512,6 @@ export default function EmicProductionDatabase() {
         />
       )}
     </div>
+    </LangContext.Provider>
   );
 }
