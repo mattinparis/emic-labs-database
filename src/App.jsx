@@ -2432,7 +2432,7 @@ export default function EmicProductionDatabase() {
           {t.season}
         </div>
         <div className="text-base uppercase font-bold mt-1.5" style={{ color: C.gold, letterSpacing: 3, fontFamily: FONTS.body }}>
-          EMIC LABS DATABASE V12
+          EMIC LABS DATABASE
         </div>
       </header>
       <FilmStripBar color={C.silver} height={6} />
