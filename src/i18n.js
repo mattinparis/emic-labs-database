@@ -160,6 +160,7 @@ export const STRINGS = {
     filled: (a, b) => `${a}/${b} filled`,
 
     // Brief
+    classes: (ns) => ns.map((n) => `Class #${n}`).join(" / "),
     calendarIntro: "The real EMIC session calendar for this project. Every production's Stage, set on its Overview tab, is one of these checkpoints.",
     examplesIntro: "Two worked examples from a previous season, kept here for reference. Click either to see the full production dossier: pitch, budget, shot list, callsheets, and jury prep.",
 
@@ -324,6 +325,7 @@ export const STRINGS = {
     noTitleClick: "Pas encore de titre. Cliquez pour commencer.",
     filled: (a, b) => `${a}/${b} remplis`,
 
+    classes: (ns) => ns.map((n) => `Cours n°${n}`).join(" / "),
     calendarIntro: "Le calendrier réel des séances EMIC pour ce projet. L'étape de chaque production, réglée dans son onglet Vue d'ensemble, correspond à l'un de ces jalons.",
     examplesIntro: "Deux exemples complets d'une saison précédente, conservés ici pour référence. Cliquez sur l'un d'eux pour voir le dossier de production complet : pitch, budget, liste des plans, feuilles de service et préparation jury.",
 
@@ -455,16 +457,16 @@ export const FR_EXAMPLES = {
         { label: "Imprévus", amount: "179" },
       ],
       schedule: [
-        { stageId: "oct", done: true, date: "3 oct.", note: "Lancement, brief créatif et groupes validés" },
-        { stageId: "nov", done: true, date: "20 nov.", note: "R&D et recherches en cours" },
-        { stageId: "dec", done: true, date: "14 déc.", note: "Suite de la R&D et de l'écriture" },
-        { stageId: "jan", done: true, date: "29 janv.", note: "Note d'intention remise" },
-        { stageId: "feb", done: true, date: "26 févr.", note: "Préproduction, budget et plan de tournage validés" },
+        { stageId: "oct", done: true, date: "3 oct.", note: "Introduction et brief" },
+        { stageId: "nov", done: true, date: "20 nov.", note: "Groupes et thèmes validés, atelier questions-réponses" },
+        { stageId: "dec", done: true, date: "14 déc.", note: "Note d'intention remise, repérages et scénario en cours" },
+        { stageId: "jan", done: true, date: "29 janv.", note: "Pitch, décors et budget présentés" },
+        { stageId: "feb", done: true, date: "26 févr.", note: "Contrats signés, moyens et plan de tournage validés" },
         { stageId: "mar", done: true, date: "25 mars", note: "Tournage terminé, rushes remis" },
         { stageId: "apr", done: true, date: "10 avr.", note: "Début de la postproduction, premier ours" },
-        { stageId: "may", done: true, date: "28 mai", note: "Premier montage présenté" },
-        { stageId: "jun", done: true, date: "20 juin", note: "Montage final et mixage verrouillés" },
-        { stageId: "jul", done: true, date: "2 juil.", note: "Projection finale et présentation au jury" },
+        { stageId: "may", done: true, date: "28 mai", note: "Visionnage interne du premier montage" },
+        { stageId: "jun", done: true, date: "20 juin", note: "Mixage final et exports livrés, projection finale devant le jury" },
+        { stageId: "jul", done: true, date: "2 juil.", note: "Débrief de la saison" },
       ],
       script:
         "LIGNE 9\n\nUn court métrage, sans dialogue.\n\nEXT. QUAI AÉRIEN DE LA LIGNE 9 – MATIN\n\nLumière du matin à travers les poutrelles d'acier. Des voyageurs se croisent dans les deux sens.\n\nYASMINE, 24 ans, sac à dos sur une épaule, entre dans le champ en montant l'escalier. Elle regarde son téléphone : 8h54. Elle presse le pas.\n\nQUAI – CONTINU\n\nYasmine attend au bord du quai, écouteurs dans les oreilles, en se balançant d'un pied sur l'autre. Gros plan sur son téléphone : toujours 8h54.\n\nUne rame entre en station. Les portes s'ouvrent.\n\nINT. RAME DE MÉTRO – CONTINU\n\nYasmine monte, balaie la rame du regard, s'assoit. En face, SYLVIE, 52 ans, est assise, son sac sur les genoux, les yeux fermés, parfaitement immobile.\n\nLes portes se ferment. Le métro démarre.\n\nLes mains de Sylvie reposent sur la bandoulière de son sac, les jointures blanches.\n\nLe regard de Yasmine glisse vers son téléphone. La musique joue doucement dans ses oreilles.\n\nUn temps. Yasmine retire un écouteur. Quelque chose a changé dans l'air. Elle jette un œil.\n\nLa respiration de Sylvie a changé, courte et irrégulière. Son sac glisse de ses genoux jusqu'au sol. Elle ne le ramasse pas.\n\nGros plan sur le téléphone de Yasmine : 8h55.\n\nLe regard de Yasmine file vers le signal d'alarme près de la porte. Revient sur Sylvie.\n\nElle se lève à moitié. Hésite. Se rassoit.\n\nLe métro commence à ralentir à l'approche de la station suivante.\n\nSylvie bascule vers l'avant et s'effondre doucement dans l'allée.\n\nLe choix a disparu. Yasmine est déjà à genoux, elle tire le signal d'alarme et prend la main de Sylvie.\n\nUne annonce enregistrée de la RATP passe dans les haut-parleurs, indifférente à ce qui se joue en dessous.\n\nLe métro s'arrête. Les portes s'ouvrent. Des voyageurs entrent, s'arrêtent, découvrent la scène, réagissent chacun à leur manière.\n\nYasmine ne lève pas les yeux. Elle reste exactement où elle est, la main de Sylvie dans la sienne.\n\nLes portes se ferment.\n\nFONDU AU NOIR.",
@@ -546,10 +548,10 @@ export const FR_EXAMPLES = {
       pitch:
         "Obtenir un décor gratuitement en échange d'un contenu exploitable, c'est exactement le modèle économique du contenu de marque indépendant. Le Salon ÉCLAT a accepté après un pitch de 20 minutes, à condition que le film fonctionne sur Instagram et TikTok sans nuire à l'image du salon, et cette contrainte a façonné tout le projet.\n\nTension à tenir tout du long : la fiction veut du grain, du naturalisme et une fin ambiguë ; ÉCLAT veut une image propre, une prestation irréprochable de son personnel et un sourire apaisé dans le miroir. Compromis trouvé dans le plan final.",
       schedule: [
-        { stageId: "oct", done: true, date: "", note: "Lancement, brief créatif et groupes validés" },
-        { stageId: "nov", done: true, date: "", note: "R&D et recherches en cours" },
-        { stageId: "dec", done: true, date: "", note: "Groupes et rôles validés" },
-        { stageId: "jan", done: true, date: "", note: "Note d'intention remise" },
+        { stageId: "oct", done: true, date: "", note: "Introduction et brief" },
+        { stageId: "nov", done: true, date: "", note: "Groupes et thèmes validés" },
+        { stageId: "dec", done: true, date: "", note: "Note d'intention remise" },
+        { stageId: "jan", done: true, date: "", note: "Pitch, décors et budget présentés" },
         { stageId: "feb", done: true, date: "", note: "Partenariat ÉCLAT confirmé" },
         { stageId: "mar", done: true, date: "", note: "Tournage terminé" },
         { stageId: "apr", done: true, date: "", note: "Début de la postproduction" },

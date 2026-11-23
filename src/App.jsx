@@ -78,16 +78,16 @@ const THEMES = [
 ];
 
 const STAGES = [
-  { id: "oct", label: "October", detail: "Intro & brief" },
-  { id: "nov", label: "November", detail: "Groups & themes · Workshop Q&A" },
-  { id: "dec", label: "December", detail: "R&D · Statement of intent, scouting, script" },
-  { id: "jan", label: "January", detail: "Pre-production · Pitch, location, budget" },
-  { id: "feb", label: "February", detail: "Pre-production · Pitch, location, budget, contracts, means" },
-  { id: "mar", label: "March", detail: "Shoot" },
-  { id: "apr", label: "April", detail: "Shoot / post-production" },
-  { id: "may", label: "May", detail: "1st screening · Internal rough cut viewing" },
-  { id: "jun", label: "June", detail: "Post-production · Final mix & exports, final jury screening" },
-  { id: "jul", label: "July", detail: "Debrief · Full class on the season" },
+  { id: "oct", label: "October", detail: "Intro & brief", classes: [1] },
+  { id: "nov", label: "November", detail: "Groups & themes · Workshop Q&A", classes: [2, 3] },
+  { id: "dec", label: "December", detail: "R&D · Statement of intent, scouting, script", classes: [4] },
+  { id: "jan", label: "January", detail: "Pre-production · Pitch, location, budget", classes: [5] },
+  { id: "feb", label: "February", detail: "Pre-production · Pitch, location, budget, contracts, means", classes: [6] },
+  { id: "mar", label: "March", detail: "Shoot", classes: [7] },
+  { id: "apr", label: "April", detail: "Shoot / post-production", classes: [8] },
+  { id: "may", label: "May", detail: "1st screening · Internal rough cut viewing", classes: [9] },
+  { id: "jun", label: "June", detail: "Post-production · Final mix & exports, final jury screening", classes: [10] },
+  { id: "jul", label: "July", detail: "Debrief · Full class on the season", classes: [11] },
 ];
 
 const TABS = [
@@ -182,16 +182,16 @@ const EXAMPLE_PRODUCTIONS = [
         { label: "Contingency", amount: "179" },
       ],
       schedule: [
-        { stageId: "oct", done: true, date: "Oct 3", note: "Kickoff, concept brief and groups confirmed" },
-        { stageId: "nov", done: true, date: "Nov 20", note: "R&D and research underway" },
-        { stageId: "dec", done: true, date: "Dec 14", note: "R&D and writing continued" },
-        { stageId: "jan", done: true, date: "Jan 29", note: "Statement of intent submitted" },
-        { stageId: "feb", done: true, date: "Feb 26", note: "Pre-production, budget and shoot plan confirmed" },
+        { stageId: "oct", done: true, date: "Oct 3", note: "Intro and brief" },
+        { stageId: "nov", done: true, date: "Nov 20", note: "Groups and themes confirmed, workshop Q&A" },
+        { stageId: "dec", done: true, date: "Dec 14", note: "Statement of intent submitted, scouting and script underway" },
+        { stageId: "jan", done: true, date: "Jan 29", note: "Pitch, location and budget presented" },
+        { stageId: "feb", done: true, date: "Feb 26", note: "Contracts signed, means and shoot plan confirmed" },
         { stageId: "mar", done: true, date: "Mar 25", note: "Shoot complete, rushes submitted" },
         { stageId: "apr", done: true, date: "Apr 10", note: "Post-production began, first assembly cut" },
-        { stageId: "may", done: true, date: "May 28", note: "Rough cut presented" },
-        { stageId: "jun", done: true, date: "Jun 20", note: "Final edit and mix locked" },
-        { stageId: "jul", done: true, date: "Jul 2", note: "Final screening and jury presentation" },
+        { stageId: "may", done: true, date: "May 28", note: "Internal rough cut screened" },
+        { stageId: "jun", done: true, date: "Jun 20", note: "Final mix and exports delivered, final jury screening" },
+        { stageId: "jul", done: true, date: "Jul 2", note: "Season debrief" },
       ],
       script:
         "LINE 9\n\nA short film, no dialogue.\n\nEXT. LINE 9 ELEVATED PLATFORM, MORNING\n\nMorning light through steel girders. Commuters cross in both directions.\n\nYASMINE, 24, backpack over one shoulder, climbs into frame from the stairwell. She checks her phone: 8:54. She quickens her pace.\n\nPLATFORM, CONTINUOUS\n\nYasmine waits at the platform edge, earbuds in, weight shifting foot to foot. Close on her phone: still 8:54.\n\nA train pulls in. Doors open.\n\nINT. SUBWAY CAR, CONTINUOUS\n\nYasmine steps aboard, scans the car, sits. Across the aisle, SYLVIE, 52, sits with her bag on her lap, eyes closed, perfectly still.\n\nThe doors close. The train pulls away.\n\nSylvie's hands rest on the bag strap, knuckles pale.\n\nYasmine's eyes drift to her phone. Music plays low in her ears.\n\nA beat. Yasmine pulls one earbud free. Something in the air has shifted. She glances over.\n\nSylvie's breathing has changed, shallow and uneven. Her bag slides from her lap to the floor. She doesn't reach for it.\n\nClose on Yasmine's phone: 8:55.\n\nYasmine's eyes flick to the alarm button beside the door. Back to Sylvie.\n\nShe half rises. Hesitates. Sits back down.\n\nThe train begins to slow for the next station.\n\nSylvie tips forward and collapses gently into the aisle.\n\nThe choice is gone. Yasmine is already on her knees, pressing the alarm button, taking Sylvie's hand.\n\nA recorded RATP announcement plays over the speakers, indifferent to what is happening below it.\n\nThe train stops. Doors open. Passengers filter in, pause, take in the scene, react in their own ways.\n\nYasmine doesn't look up. She stays exactly where she is, holding Sylvie's hand.\n\nThe doors close.\n\nFADE OUT.",
@@ -281,10 +281,10 @@ const EXAMPLE_PRODUCTIONS = [
       script: "",
       budget: [],
       schedule: [
-        { stageId: "oct", done: true, date: "", note: "Kickoff, concept brief and groups confirmed" },
-        { stageId: "nov", done: true, date: "", note: "R&D and research underway" },
-        { stageId: "dec", done: true, date: "", note: "Groups and roles confirmed" },
-        { stageId: "jan", done: true, date: "", note: "Statement of intent submitted" },
+        { stageId: "oct", done: true, date: "", note: "Intro and brief" },
+        { stageId: "nov", done: true, date: "", note: "Groups and themes confirmed" },
+        { stageId: "dec", done: true, date: "", note: "Statement of intent submitted" },
+        { stageId: "jan", done: true, date: "", note: "Pitch, location and budget presented" },
         { stageId: "feb", done: true, date: "", note: "ÉCLAT partnership confirmed" },
         { stageId: "mar", done: true, date: "", note: "Shoot complete" },
         { stageId: "apr", done: true, date: "", note: "Post-production began" },
@@ -2137,8 +2137,11 @@ function BriefView({ onOpenExample }) {
                   <div className="flex items-center justify-center px-4 py-3 flex-shrink-0" style={{ background: C.gold, minWidth: 120 }}>
                     <span className="text-sm font-bold" style={{ color: "#141414", fontFamily: FONTS.body }}>{s.label}</span>
                   </div>
-                  <div className="flex items-center px-4 py-3" style={{ color: C.ink, fontFamily: FONTS.body, fontSize: 14 }}>
+                  <div className="flex items-center px-4 py-3 flex-1" style={{ color: C.ink, fontFamily: FONTS.body, fontSize: 14 }}>
                     {s.detail}
+                  </div>
+                  <div className="flex items-center px-4 py-3 flex-shrink-0 text-xs font-bold" style={{ color: C.gold, fontFamily: FONTS.mono }}>
+                    {t.classes(s.classes)}
                   </div>
                 </div>
               ))}
