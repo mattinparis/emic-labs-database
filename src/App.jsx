@@ -80,12 +80,12 @@ const THEMES = [
 const STAGES = [
   { id: "oct", label: "October", detail: "Intro & brief", classes: [1] },
   { id: "nov", label: "November", detail: "Groups & themes · Workshop Q&A", classes: [2, 3] },
-  { id: "dec", label: "December", detail: "R&D · Statement of intent, scouting, script", classes: [4] },
+  { id: "dec", label: "December", detail: "R&D · Statement of intent, script", classes: [4] },
   { id: "jan", label: "January", detail: "Pre-production · Pitch, location, budget", classes: [5] },
   { id: "feb", label: "February", detail: "Pre-production · Pitch, location, budget, contracts, means", classes: [6] },
   { id: "mar", label: "March", detail: "Shoot", classes: [7] },
   { id: "apr", label: "April", detail: "Shoot / post-production", classes: [8] },
-  { id: "may", label: "May", detail: "1st screening · Internal rough cut viewing", classes: [9] },
+  { id: "may", label: "May", detail: "1st screening · Internal rough cut viewing · Post-production", classes: [9] },
   { id: "jun", label: "June", detail: "Post-production · Final mix & exports, final jury screening", classes: [10] },
   { id: "jul", label: "July", detail: "Debrief · Full class on the season", classes: [11] },
 ];
@@ -130,11 +130,17 @@ const DOSSIER_SECTIONS = [
     key: "specs",
     label: "Technical Specifications",
     body: [
-      ["Format & length", "2 min (± 10 sec) · 16:9, 1080p minimum · Stereo, mastered at –14 LUFS · .MP4, H.264 or H.265 · credits included within the 2 minutes"],
+      ["Format & length", "2 to 4 min (± 10 sec) · 16:9, 1080p minimum · Stereo, mastered at –14 LUFS · .MP4, H.264 or H.265 · credits included within the total running time"],
       ["Equipment", "iPhone (native camera or Filmic Pro) · motorized gimbal and/or tripod allowed · live sound (at least 1 synchronous on-location scene) · natural light preferred (at least 1 scene)"],
+      ["Kit: image", "1 x iPhone Pro 512 Go · 1 x Cage iPhone + poignées · 1 x Stabilisateur smartphone type DJI Osmo Mobile · 1 x Trépied compact à tête fluide · 1 x Kit filtres ND + support · 1 x Micro moniteur (optionnel)"],
+      ["Kit: sound", "1 x Kit HF cravate sans fil pour 2 personnes · 1 x Micro secours · 1 x Kit son perche · 1 x Enregistreur / interface · 2 x Casque de monitoring fermé"],
+      ["Kit: lighting", "2 x Light panels LED/COB bicolores compactes · 2 x Pieds de lumière + diffuseurs · 1 x Réflecteur pliable"],
+      ["Kit: chargers and backup", "1 x SSD externe renforcé 2 To · 1 x Batterie externe USB-C PD 20 000 mAh · 1 x Hub USB-C / câbles / support SSD · 1 x Station de charge centrale multiports USB-C PD"],
+      ["Kit: misc", "1 x Trousse de consommables de production (consommables d'urgence) · 1 x Sac de production matelassé"],
       ["Required settings", "1 OUTDOOR sequence · 1 INDOOR sequence · 1 TRANSIT sequence. These apply to every group, regardless of theme."],
-      ["Cast & music", "Max. 5 actors, min. 2 · royalty-free (CC) or original music with a signed rights transfer"],
-      ["Budget template", "€1,000 EMIC base allocation, a starting point, not a ceiling. Groups raise additional funds, justify every expense, and return any surplus to EMIC. Financial rigor is evaluated by the jury."],
+      ["Cast", "Max. 5 actors, min. 2 · Extras possible if required"],
+      ["Music", "Royalty-free (CC) or original music with a signed rights transfer"],
+      ["Budget template", "€1,000 EMIC Lab base allocation, a starting point, not a ceiling. Groups raise additional funds, justify every expense, and return any surplus to EMIC. Financial rigor is evaluated by the jury."],
     ],
   },
   {
@@ -257,7 +263,7 @@ const EXAMPLE_PRODUCTIONS = [
         { name: "David", role: "Unit Manager", phone: "", email: "" },
         { name: "Daphné", role: "Cameraman", phone: "", email: "" },
       ],
-      equipment: ["iPhone, native camera", "DJI Mic 2", "Gimbal", "Telephoto lens attachment", "2x Light Panels", "2x RF Mics", "1x Boom Mic", "1x Portable monitor"],
+      equipment: ["iPhone, native camera", "DJI Mic 2", "Gimbal", "Telephoto lens attachment", "2x Light Panels", "2x RF Mics", "1x Boom Mic", "1x Portable monitor", "IMAGE : 1 x iPhone Pro 512 Go", "IMAGE : 1 x Cage iPhone + poignées", "IMAGE : 1 x Stabilisateur smartphone type DJI Osmo Mobile", "IMAGE : 1 x Trépied compact à tête fluide", "IMAGE : 1 x Kit filtres ND + support", "IMAGE : 1 x Micro moniteur (optionnel)", "SON : 1 x Kit HF cravate sans fil pour 2 personnes", "SON : 1 x Micro secours", "SON : 1 x Kit son perche", "SON : 1 x Enregistreur / interface", "SON : 2 x Casque de monitoring fermé", "LUMIÈRE : 2 x Light panels LED/COB bicolores compactes", "LUMIÈRE : 2 x Pieds de lumière + diffuseurs", "LUMIÈRE : 1 x Réflecteur pliable", "CHARGEURS ET BACKUP : 1 x SSD externe renforcé 2 To", "CHARGEURS ET BACKUP : 1 x Batterie externe USB-C PD 20 000 mAh", "CHARGEURS ET BACKUP : 1 x Hub USB-C / câbles / support SSD", "CHARGEURS ET BACKUP : 1 x Station de charge centrale multiports USB-C PD", "DIVERS : 1 x Trousse de consommables de production (consommables d'urgence)", "DIVERS : 1 x Sac de production matelassé"],
       props: ["Sylvie's bag, must slide cleanly for shot 09", "Yasmine's backpack", "Sylvie's coat"],
       jury:
         "Q The open ending: choice or lack of courage?\n→ Fully deliberate, viewers leave wondering what they would have done.\n\nQ An RATP permit in 3 weeks?\n→ Filed at M2, followed up at M3, confirmed at M5. Backup plan ready at an elevated station.\n\nQ Only 2 actors?\n→ Deliberate constraint: Yasmine's solitude had to be real.\n\nQ No dialogue, limitation or choice?\n→ Total choice, the dilemma reads on her face, with no language barrier.",
@@ -2128,9 +2134,6 @@ function BriefView({ onOpenExample }) {
       <div className="col-span-3">
         {active.key === "calendar" ? (
           <div>
-            <p className="text-sm mb-4" style={{ color: C.sub, fontFamily: FONTS.body }}>
-              {t.calendarIntro}
-            </p>
             <div className="space-y-2">
               {STAGES.map((s) => (
                 <div key={s.id} className="flex items-stretch rounded-lg overflow-hidden" style={{ background: C.card, border: `1px solid ${C.line}` }}>
