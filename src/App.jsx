@@ -131,12 +131,7 @@ const DOSSIER_SECTIONS = [
     label: "Technical Specifications",
     body: [
       ["Format & length", "2 to 4 min (± 10 sec) · 16:9, 1080p minimum · Stereo, mastered at –14 LUFS · .MP4, H.264 or H.265 · credits included within the total running time"],
-      ["Equipment", "iPhone (native camera or Filmic Pro) · motorized gimbal and/or tripod allowed · live sound (at least 1 synchronous on-location scene) · natural light preferred (at least 1 scene)"],
-      ["Kit: image", "1 x iPhone Pro 512 Go · 1 x Cage iPhone + poignées · 1 x Stabilisateur smartphone type DJI Osmo Mobile · 1 x Trépied compact à tête fluide · 1 x Kit filtres ND + support · 1 x Micro moniteur (optionnel)"],
-      ["Kit: sound", "1 x Kit HF cravate sans fil pour 2 personnes · 1 x Micro secours · 1 x Kit son perche · 1 x Enregistreur / interface · 2 x Casque de monitoring fermé"],
-      ["Kit: lighting", "2 x Light panels LED/COB bicolores compactes · 2 x Pieds de lumière + diffuseurs · 1 x Réflecteur pliable"],
-      ["Kit: chargers and backup", "1 x SSD externe renforcé 2 To · 1 x Batterie externe USB-C PD 20 000 mAh · 1 x Hub USB-C / câbles / support SSD · 1 x Station de charge centrale multiports USB-C PD"],
-      ["Kit: misc", "1 x Trousse de consommables de production (consommables d'urgence) · 1 x Sac de production matelassé"],
+      ["Equipment", "iPhone (native camera or Filmic Pro) · motorized gimbal and/or tripod allowed · live sound (at least 1 synchronous on-location scene) · natural light preferred (at least 1 scene)\n\nIMAGE: 1 x iPhone Pro 512 Go · 1 x Cage iPhone + poignées · 1 x Stabilisateur smartphone type DJI Osmo Mobile · 1 x Trépied compact à tête fluide · 1 x Kit filtres ND + support · 1 x Micro moniteur (optionnel)\nSON: 1 x Kit HF cravate sans fil pour 2 personnes · 1 x Micro secours · 1 x Kit son perche · 1 x Enregistreur / interface · 2 x Casque de monitoring fermé\nLUMIÈRE: 2 x Light panels LED/COB bicolores compactes · 2 x Pieds de lumière + diffuseurs · 1 x Réflecteur pliable\nCHARGEURS ET BACKUP: 1 x SSD externe renforcé 2 To · 1 x Batterie externe USB-C PD 20 000 mAh · 1 x Hub USB-C / câbles / support SSD · 1 x Station de charge centrale multiports USB-C PD\nDIVERS: 1 x Trousse de consommables de production (consommables d'urgence) · 1 x Sac de production matelassé"],
       ["Required settings", "1 OUTDOOR sequence · 1 INDOOR sequence · 1 TRANSIT sequence. These apply to every group, regardless of theme."],
       ["Cast", "Max. 5 actors, min. 2 · Extras possible if required"],
       ["Music", "Royalty-free (CC) or original music with a signed rights transfer"],
@@ -190,12 +185,12 @@ const EXAMPLE_PRODUCTIONS = [
       schedule: [
         { stageId: "oct", done: true, date: "Oct 3", note: "Intro and brief" },
         { stageId: "nov", done: true, date: "Nov 20", note: "Groups and themes confirmed, workshop Q&A" },
-        { stageId: "dec", done: true, date: "Dec 14", note: "Statement of intent submitted, scouting and script underway" },
+        { stageId: "dec", done: true, date: "Dec 14", note: "Statement of intent submitted, script underway" },
         { stageId: "jan", done: true, date: "Jan 29", note: "Pitch, location and budget presented" },
         { stageId: "feb", done: true, date: "Feb 26", note: "Contracts signed, means and shoot plan confirmed" },
         { stageId: "mar", done: true, date: "Mar 25", note: "Shoot complete, rushes submitted" },
         { stageId: "apr", done: true, date: "Apr 10", note: "Post-production began, first assembly cut" },
-        { stageId: "may", done: true, date: "May 28", note: "Internal rough cut screened" },
+        { stageId: "may", done: true, date: "May 28", note: "Internal rough cut screened · Post-production" },
         { stageId: "jun", done: true, date: "Jun 20", note: "Final mix and exports delivered, final jury screening" },
         { stageId: "jul", done: true, date: "Jul 2", note: "Season debrief" },
       ],
@@ -2166,7 +2161,7 @@ function BriefView({ onOpenExample }) {
             {active.body.map(([label, text]) => (
               <div key={label} className="rounded-xl p-4" style={{ background: C.card, border: `1px solid ${C.line}` }}>
                 <div className="text-xs font-bold uppercase tracking-widest mb-2" style={{ color: C.gold }}>{label}</div>
-                <p className="text-sm leading-relaxed" style={{ color: C.ink, fontFamily: FONTS.body }}>{text}</p>
+                <p className="text-sm leading-relaxed" style={{ color: C.ink, fontFamily: FONTS.body, whiteSpace: "pre-line" }}>{text}</p>
               </div>
             ))}
           </div>
