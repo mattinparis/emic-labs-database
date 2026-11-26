@@ -161,7 +161,6 @@ export const STRINGS = {
 
     // Brief
     classes: (ns) => ns.map((n) => `Class #${n}`).join(" / "),
-    calendarIntro: "The real EMIC session calendar for this project. Every production's Stage, set on its Overview tab, is one of these checkpoints.",
     examplesIntro: "Two worked examples from a previous season, kept here for reference. Click either to see the full production dossier: pitch, budget, shot list, callsheets, and jury prep.",
 
 
@@ -326,7 +325,6 @@ export const STRINGS = {
     filled: (a, b) => `${a}/${b} remplis`,
 
     classes: (ns) => ns.map((n) => `Cours n°${n}`).join(" / "),
-    calendarIntro: "Le calendrier réel des séances EMIC pour ce projet. L'étape de chaque production, réglée dans son onglet Vue d'ensemble, correspond à l'un de ces jalons.",
     examplesIntro: "Deux exemples complets d'une saison précédente, conservés ici pour référence. Cliquez sur l'un d'eux pour voir le dossier de production complet : pitch, budget, liste des plans, feuilles de service et préparation jury.",
 
 
@@ -382,12 +380,12 @@ export const FR_THEMES = {
 export const FR_STAGES = {
   oct: { label: "Octobre", detail: "Introduction et brief" },
   nov: { label: "Novembre", detail: "Groupes et thèmes · Atelier questions-réponses" },
-  dec: { label: "Décembre", detail: "R&D · Note d'intention, repérages, scénario" },
+  dec: { label: "Décembre", detail: "R&D · Note d'intention, scénario" },
   jan: { label: "Janvier", detail: "Préproduction · Pitch, décors, budget" },
   feb: { label: "Février", detail: "Préproduction · Pitch, décors, budget, contrats, moyens" },
   mar: { label: "Mars", detail: "Tournage" },
   apr: { label: "Avril", detail: "Tournage / postproduction" },
-  may: { label: "Mai", detail: "1re projection · Visionnage interne du premier montage" },
+  may: { label: "Mai", detail: "1re projection · Visionnage interne du premier montage · Postproduction" },
   jun: { label: "Juin", detail: "Postproduction · Mixage final et exports, projection finale devant le jury" },
   jul: { label: "Juillet", detail: "Débrief · Séance complète sur la saison" },
 };
@@ -422,11 +420,17 @@ export const FR_DOSSIER = {
   specs: {
     label: "Cahier des charges technique",
     body: [
-      ["Format et durée", "2 min (± 10 s) · 16:9, 1080p minimum · Stéréo, masterisé à –14 LUFS · .MP4, H.264 ou H.265 · générique inclus dans les 2 minutes"],
+      ["Format et durée", "2 à 4 min (± 10 s) · 16:9, 1080p minimum · Stéréo, masterisé à –14 LUFS · .MP4, H.264 ou H.265 · générique inclus dans la durée totale"],
       ["Matériel", "iPhone (caméra native ou Filmic Pro) · stabilisateur motorisé et/ou trépied autorisés · son direct (au moins 1 scène synchrone en décor réel) · lumière naturelle privilégiée (au moins 1 scène)"],
+      ["Kit : image", "1 x iPhone Pro 512 Go · 1 x Cage iPhone + poignées · 1 x Stabilisateur smartphone type DJI Osmo Mobile · 1 x Trépied compact à tête fluide · 1 x Kit filtres ND + support · 1 x Micro moniteur (optionnel)"],
+      ["Kit : son", "1 x Kit HF cravate sans fil pour 2 personnes · 1 x Micro secours · 1 x Kit son perche · 1 x Enregistreur / interface · 2 x Casque de monitoring fermé"],
+      ["Kit : lumière", "2 x Light panels LED/COB bicolores compactes · 2 x Pieds de lumière + diffuseurs · 1 x Réflecteur pliable"],
+      ["Kit : chargeurs et backup", "1 x SSD externe renforcé 2 To · 1 x Batterie externe USB-C PD 20 000 mAh · 1 x Hub USB-C / câbles / support SSD · 1 x Station de charge centrale multiports USB-C PD"],
+      ["Kit : divers", "1 x Trousse de consommables de production (consommables d'urgence) · 1 x Sac de production matelassé"],
       ["Décors imposés", "1 séquence en EXTÉRIEUR · 1 séquence en INTÉRIEUR · 1 séquence EN TRANSPORT. Valable pour tous les groupes, quel que soit le thème."],
-      ["Casting et musique", "5 comédiens max., 2 min. · musique libre de droits (CC) ou originale avec cession de droits signée"],
-      ["Modèle de budget", "Dotation de base EMIC de 1 000 €, un point de départ, pas un plafond. Les groupes lèvent des fonds supplémentaires, justifient chaque dépense et reversent tout excédent à l'EMIC. La rigueur financière est évaluée par le jury."],
+      ["Casting", "5 comédiens max., 2 min. · Figurants possibles si nécessaire"],
+      ["Musique", "Musique libre de droits (CC) ou originale avec cession de droits signée"],
+      ["Modèle de budget", "Dotation de base EMIC Lab de 1 000 €, un point de départ, pas un plafond. Les groupes lèvent des fonds supplémentaires, justifient chaque dépense et reversent tout excédent à l'EMIC. La rigueur financière est évaluée par le jury."],
     ],
   },
   calendar: { label: "Calendrier" },
@@ -444,7 +448,7 @@ export const FR_EXAMPLES = {
     length: "1 min 57 s",
     sections: {
       pitch:
-        "Notre lecture du thème « Le mensonge ordinaire » ne repose pas sur un mensonge prononcé, mais sur un mensonge d'inaction : celui qu'on se raconte pour justifier de ne pas agir.\n\nYasmine, 24 ans, prend le métro pour se rendre à son entretien à l'EMIC. Elle est en retard. Dans la rame, une femme fait un malaise. Le film dure exactement le temps de ce trajet. En 2 minutes, Yasmine n'a pas le temps de réfléchir : elle doit ressentir, décider, agir.\n\nLe plan final : Yasmine assise, vue de dos, tandis que le métro repart. Elle est restée. Le dilemme, ce n'est pas ce qu'on fait, mais ce qu'on a failli faire.\n\nStructure dramatique\nEXPOSITION (0:00 à 0:28) : On installe l'univers intérieur de Yasmine. Sylvie est assise en arrière-plan, rien n'est encore visible.\nÉLÉMENT DÉCLENCHEUR (0:28 à 0:50) : Sylvie s'affaisse. Le malaise s'installe, en silence.\nDILEMME (0:50 à 1:22) : Yasmine hésite devant le signal d'alarme. Le métro ralentit.\nBASCULE (1:22 à 1:45) : Sylvie tombe. Le choix n'existe plus. Yasmine agit.\nRÉSOLUTION OUVERTE (1:45 à 1:57) : Les portes se ferment. Fondu au noir.",
+        "Notre lecture du thème « Le mensonge ordinaire » ne repose pas sur un mensonge prononcé, mais sur un mensonge d'inaction : celui qu'on se raconte pour justifier de ne pas agir.\n\nYasmine, 24 ans, prend le métro pour se rendre à un entretien pour le travail de ses rêves : son entretien à l'EMIC. Le métro prend du retard. Dans la rame, une femme fait un malaise. Le film dure exactement le temps de ce trajet. En 2 à 4 minutes, Yasmine n'a pas le temps de réfléchir : elle doit ressentir, décider, agir.\n\nLe plan final : Yasmine assise, vue de dos, tandis que le métro repart. Elle est restée. Le dilemme, ce n'est pas ce qu'on fait, mais ce qu'on a failli faire.\n\nLe choix d'assurer son entretien et le sentiment de culpabilité d'abandonner la victime, ou de rester pour s'assurer que Sylvie est entre de bonnes mains, quitte à perdre son job ?\n\nStructure dramatique\nEXPOSITION (0:00 à 0:28) : On installe l'univers intérieur de Yasmine. Sylvie est assise en arrière-plan, rien n'est encore visible.\nÉLÉMENT DÉCLENCHEUR (0:28 à 0:50) : Sylvie s'affaisse. Le malaise s'installe, en silence.\nDILEMME (0:50 à 1:22) : Yasmine hésite devant le signal d'alarme. Le métro ralentit.\nBASCULE (1:22 à 1:45) : Sylvie tombe. Le choix n'existe plus. Yasmine agit.\nRÉSOLUTION OUVERTE (1:45 à 1:57) : Les portes se ferment. Fondu au noir.",
       budget: [
         { label: "Autorisation RATP", amount: "0" },
         { label: "DJI Mic 2, location 2 jours", amount: "55" },
@@ -532,7 +536,7 @@ export const FR_EXAMPLES = {
         { name: "David", role: "Régie", phone: "", email: "" },
         { name: "Daphné", role: "Image", phone: "", email: "" },
       ],
-      equipment: ["iPhone, caméra native", "DJI Mic 2", "Stabilisateur (gimbal)", "Complément téléobjectif", "2 panneaux LED", "2 micros HF", "1 perche", "1 moniteur portable"],
+      equipment: ["iPhone, caméra native", "DJI Mic 2", "Stabilisateur (gimbal)", "Complément téléobjectif", "2 panneaux LED", "2 micros HF", "1 perche", "1 moniteur portable", "IMAGE : 1 x iPhone Pro 512 Go", "IMAGE : 1 x Cage iPhone + poignées", "IMAGE : 1 x Stabilisateur smartphone type DJI Osmo Mobile", "IMAGE : 1 x Trépied compact à tête fluide", "IMAGE : 1 x Kit filtres ND + support", "IMAGE : 1 x Micro moniteur (optionnel)", "SON : 1 x Kit HF cravate sans fil pour 2 personnes", "SON : 1 x Micro secours", "SON : 1 x Kit son perche", "SON : 1 x Enregistreur / interface", "SON : 2 x Casque de monitoring fermé", "LUMIÈRE : 2 x Light panels LED/COB bicolores compactes", "LUMIÈRE : 2 x Pieds de lumière + diffuseurs", "LUMIÈRE : 1 x Réflecteur pliable", "CHARGEURS ET BACKUP : 1 x SSD externe renforcé 2 To", "CHARGEURS ET BACKUP : 1 x Batterie externe USB-C PD 20 000 mAh", "CHARGEURS ET BACKUP : 1 x Hub USB-C / câbles / support SSD", "CHARGEURS ET BACKUP : 1 x Station de charge centrale multiports USB-C PD", "DIVERS : 1 x Trousse de consommables de production (consommables d'urgence)", "DIVERS : 1 x Sac de production matelassé"],
       props: ["Le sac de Sylvie, doit glisser proprement pour le plan 09", "Le sac à dos de Yasmine", "Le manteau de Sylvie"],
       jury:
         "Q La fin ouverte : un choix ou un manque de courage ?\n→ Totalement assumée : le public repart en se demandant ce qu'il aurait fait.\n\nQ Une autorisation RATP en 3 semaines ?\n→ Déposée à M2, relancée à M3, confirmée à M5. Plan B prêt dans une station aérienne.\n\nQ Seulement 2 comédiennes ?\n→ Contrainte assumée : la solitude de Yasmine devait être réelle.\n\nQ Pas de dialogue : une limite ou un choix ?\n→ Un choix total : le dilemme se lit sur son visage, sans barrière de la langue.",
